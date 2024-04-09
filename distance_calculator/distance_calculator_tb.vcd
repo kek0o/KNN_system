@@ -1,0 +1,77 @@
+$date
+	Tue Apr  9 12:37:44 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module distance_calculator_tb $end
+$var wire 32 ! distance [31:0] $end
+$var wire 32 " data_type [31:0] $end
+$var parameter 32 # B $end
+$var parameter 32 $ M $end
+$var parameter 32 % N $end
+$var reg 32 & training_data_type [31:0] $end
+$scope module uut $end
+$var wire 32 ' training_data_type [31:0] $end
+$var parameter 32 ( B $end
+$var parameter 32 ) M $end
+$var parameter 32 * N $end
+$var reg 32 + data_type [31:0] $end
+$var reg 32 , distance [31:0] $end
+$var reg 32 - sub [31:0] $end
+$var reg 32 . sum [31:0] $end
+$var integer 32 / i [31:0] $end
+$var integer 32 0 j [31:0] $end
+$upscope $end
+$scope begin $ivl_for_loop0 $end
+$var integer 32 1 i [31:0] $end
+$scope begin $ivl_for_loop1 $end
+$var integer 32 2 j [31:0] $end
+$upscope $end
+$upscope $end
+$scope begin $ivl_for_loop2 $end
+$var integer 32 3 i [31:0] $end
+$scope begin $ivl_for_loop3 $end
+$var integer 32 4 j [31:0] $end
+$upscope $end
+$upscope $end
+$scope begin $ivl_for_loop4 $end
+$var integer 32 5 i [31:0] $end
+$scope begin $ivl_for_loop5 $end
+$var integer 32 6 j [31:0] $end
+$upscope $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b11 *
+b10 )
+b100000 (
+b11 %
+b10 $
+b100000 #
+$end
+#0
+$dumpvars
+b11 6
+b10 5
+b11 4
+b10 3
+b11 2
+b10 1
+b11 0
+b10 /
+b110101111011001010 .
+b10101101 -
+b110101111011001010 ,
+b10 +
+b10 '
+b10 &
+b10 "
+b110101111011001010 !
+$end
+#10000
