@@ -41,23 +41,23 @@ always @(posedge clk)
         end
         CALCULATE: begin
           //colums calculation stage
-          for ( j = 0; j < N; j = j + 1) begin
-            sub <= input_data[i][j] - training_data[i][j];
-            sum <= sum + sub*sub;
-          end
-        
-          if (i == M - 1) begin
+          if (i < M) begin
+            for (j = 0; j < N; j = j + 1) begin
+              sub = input_data[i][j] - training_data[i][j];
+              sum = sum + sub*sub;
+            end
+            i <= i + 1; //rows calculation stage
+
+          end else begin
             i <= 0;
 
             state <= DONE;
             done <= 1;
             distance <= sum; //square root avoided for its hardware complexity
-
-          end else begin //rows calculation stage
-            i <= i + 1;
           end
         end
         DONE: begin
+          done <= 0;
           state <= IDLE;
         end
      endcase
