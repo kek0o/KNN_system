@@ -1,24 +1,34 @@
-`timescale 1ns/1ps
+`timescale 10ns/1ns
 `include "distance_sort.v"
 `include "sort_2.v"
 
 module distance_sort_tb;
 
+reg clk, rst, done;
 reg [B-1:0] distance_array[0:N-1];
 reg [B-1:0] type_array[0:N-1];
 
 wire [B-1:0] distance_array_sorted[0:N-1];
 wire [B-1:0] type_array_sorted[0:N-1];
+wire valid_sort;
 
 integer i;
 parameter N = 64, B = 32;
 
-distance_sort #(N, B) uut(distance_array, type_array, distance_array_sorted, type_array_sorted);
+distance_sort #(N, B) uut(clk, rst, done, distance_array, type_array, distance_array_sorted, type_array_sorted, valid_sort);
 
-initial
-begin
-  $dumpfile("distance_sort_tb.vcd");
-  $dumpvars;
+// clk generation
+initial begin
+  clk = 1;
+  forever #20 clk = ~clk;
+end
+
+//stimuli generation
+initial begin
+  
+  rst = 1;
+  done = 0;
+  #15 rst = 0;
 
   for (i = 0; i < N; i = i + 1) begin
     distance_array[i] = $urandom_range(0,100);
@@ -29,36 +39,50 @@ begin
     else if (distance_array[i] < 80) type_array[i] = 1;
     else type_array[i] = 4;
   end
+  
+  #20 done = 1;
+  #20 done = 0;
+
   $display("distance&type_array = [");
   for ( i = 0; i < N - 2 ; i = i + 1) begin
     $display("%0d, %0d, ", distance_array[i], type_array[i]);
   end
   $display("%0d, %0d]", distance_array[N-1], type_array[N-1]);
 
-  #100
-
- $display("distance&type_array_sorted = [");
-  for ( i = 0; i < N; i = i + 1) begin
-    $display("%0d, %0d ", distance_array_sorted[i], type_array_sorted[i]);
-  end
-
-  #20 
+  #150
 
   for ( i = 0; i < N; i = i + 1) begin
     distance_array[i] = i;
   end
-   $display("distance_array = [");
+
+  #20 done = 1;
+  #20 done = 0;
+  
+  $display("distance_array = [");
   for ( i = 0; i < N; i = i + 1) begin
     $display("%0f,", distance_array[i]);
   end
-  
-  #100
-     $display("distance_array_sorted = [");
-  for ( i = 0; i < N; i = i + 1) begin
-    $display("%0f,", distance_array_sorted[i]);
-  end 
-
 end
 
+initial begin
+  $dumpfile("distance_sort_tb.vcd");
+  $dumpvars;
+
+  #60
+ $display("distance&type_array_sorted = [");
+  for ( i = 0; i < N; i = i + 1) begin
+    $display("%0d, %0d ", distance_array_sorted[i], type_array_sorted[i]);
+  end
+  
+  #200
+
+  $display("distance_array_sorted = [");
+  for ( i = 0; i < N; i = i + 1) begin
+    $display("%0f,", distance_array_sorted[i]);
+  end
+
+  #2000
+  $finish;
+end
 endmodule
 
