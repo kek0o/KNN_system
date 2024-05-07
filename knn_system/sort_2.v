@@ -1,4 +1,4 @@
- module sort_2 #(parameter W)(
+ module sort_2 #(parameter W = 32)(
    input wire [W-1:0] A, B, A_type, B_type,
    output wire [W-1:0] H, L, H_type, L_type
  );

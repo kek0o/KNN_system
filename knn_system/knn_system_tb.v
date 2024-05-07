@@ -6,17 +6,17 @@
 
 module knn_system_tb;
 
-reg clk, rst, start, ready;
-reg [0:M-1][0:N-1][W-1:0] training_data [0:L-1];
+reg clk, rst, start, read_done, write_done;
+reg [W-1:0] training_data [0:L-1][0:M-1][0:N-1];
 reg [W-1:0] training_data_type [0:L-1];
 reg [W-1:0] input_data [0:M-1][0:N-1];
 wire [W-1:0] distance_array_sorted [0:L-1];
 wire [W-1:0] type_array_sorted [0:L-1];
-wire read;
+wire read, write;
 
 parameter M = 2, N = 3, W = 32, K = 7, L = 15;
 
-knn_system #(M,N,W,K,L) uut(clk, rst, start, ready, training_data, training_data_type, input_data, distance_array_sorted, type_array_sorted, read);
+knn_system #(M,N,W,K,L) uut(clk, rst, start, read_done, write_done, training_data, training_data_type, input_data, distance_array_sorted, type_array_sorted, read, write);
 
 initial
 begin
@@ -24,7 +24,7 @@ begin
   $dumpvars;
 
   clk = 0;
-  forever #5 clk = ~clk;
+  forever #20 clk = ~clk;
 
   training_data_type = $urandom_range(0,3);
   
