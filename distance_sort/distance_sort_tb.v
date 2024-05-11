@@ -4,7 +4,7 @@
 
 module distance_sort_tb;
 
-reg clk, rst, done;
+reg clk, rst, validating_data;
 reg [B-1:0] distance_array[0:N-1];
 reg [B-1:0] type_array[0:N-1];
 
@@ -15,7 +15,7 @@ wire valid_sort;
 integer i;
 parameter N = 64, B = 32;
 
-distance_sort #(N, B) uut(clk, rst, done, distance_array, type_array, distance_array_sorted, type_array_sorted, valid_sort);
+distance_sort #(N, B) uut(clk, rst, validating_data, distance_array, type_array, distance_array_sorted, type_array_sorted, valid_sort);
 
 // clk generation
 initial begin
@@ -27,7 +27,7 @@ end
 initial begin
   
   rst = 1;
-  done = 0;
+  validating_data= 0;
   #15 rst = 0;
 
   for (i = 0; i < N; i = i + 1) begin
@@ -40,8 +40,8 @@ initial begin
     else type_array[i] = 4;
   end
   
-  #20 done = 1;
-  #20 done = 0;
+  #20 validating_data = 1;
+  #2000 validating_data = 0;
 
   $display("distance&type_array = [");
   for ( i = 0; i < N - 2 ; i = i + 1) begin
@@ -55,8 +55,8 @@ initial begin
     distance_array[i] = i;
   end
 
-  #20 done = 1;
-  #20 done = 0;
+  #20 validating_data = 1;
+  #2000 validating_data = 0;
   
   $display("distance_array = [");
   for ( i = 0; i < N; i = i + 1) begin
@@ -68,20 +68,20 @@ initial begin
   $dumpfile("distance_sort_tb.vcd");
   $dumpvars;
 
-  #60
+  #2200
  $display("distance&type_array_sorted = [");
   for ( i = 0; i < N; i = i + 1) begin
     $display("%0d, %0d ", distance_array_sorted[i], type_array_sorted[i]);
   end
   
-  #200
+  #3000
 
   $display("distance_array_sorted = [");
   for ( i = 0; i < N; i = i + 1) begin
     $display("%0f,", distance_array_sorted[i]);
   end
 
-  #2000
+  #20
   $finish;
 end
 endmodule

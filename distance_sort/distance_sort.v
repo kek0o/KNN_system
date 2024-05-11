@@ -1,7 +1,7 @@
 module distance_sort #(parameter N, W)(
   input wire clk,
   input wire rst,
-  input wire done,
+  input wire validating_data,
   input wire [W-1:0] distance_array[0:N-1], 
   input wire [W-1:0] type_array[0:N-1],
   output reg [W-1:0] distance_array_sorted[0:N-1],
@@ -13,6 +13,8 @@ genvar i, j;
 
 reg [W-1:0] distance_array_sorted_temp[0:N-1];
 reg [W-1:0] type_array_sorted_temp[0:N-1];
+reg [W-1:0] distance_array_sorted_sync[0:2*N-1];
+
 
 reg [W-1:0] temp_array[0:N*(N+1)-1];
 reg [W-1:0] type_temp_array[0:N*(N+1)-1];
@@ -49,22 +51,38 @@ generate
 endgenerate
 
 integer k;
+reg stability_error;
 
 always @(posedge clk)
   begin
     if (rst) begin
-      valid_sort <= 0;
+      valid_sort <= 1'b0;
+      stability_error <= 1'b0;
       for (k = 0; k < N; k = k + 1) begin
-        distance_array_sorted[k] = 0;
-        type_array_sorted[k] = 0;
+        distance_array_sorted[k] = {W{1'b0}};
+        type_array_sorted[k] = {W{1'b0}};
       end
     end else begin
-      if (done) begin
+      if (validating_data) begin
         for (k = 0; k < N; k = k + 1) begin
-          distance_array_sorted[k] <= distance_array_sorted_temp[k]; //valid sorted array when correct data on input (done)
-          type_array_sorted[k] <= type_array_sorted_temp[k]; //valid type array when correct data on input (done)
+          distance_array_sorted_sync[k] <= distance_array_sorted_temp[k]; 
+          distance_array_sorted_sync[N + k] <= distance_array_sorted_sync[k]; 
         end
-        valid_sort <= 1;
+
+        for (k = 0; k < N; k = k + 1) begin
+          if(distance_array_sorted_sync[k] != distance_array_sorted_sync[N + k]) begin
+            stability_error = 1'b1;
+          end
+        end
+        
+        if (stability_error == 1'b0) begin
+          for (k = 0; k < N; k = k + 1) begin
+            distance_array_sorted[k] <= distance_array_sorted_temp[k]; 
+            type_array_sorted[k] <= type_array_sorted_temp[k]; 
+          end
+          valid_sort <= 1'b1;
+        end
+
       end else begin
         valid_sort <= 0;
       end
