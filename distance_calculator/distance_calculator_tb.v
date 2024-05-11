@@ -4,9 +4,9 @@
 module distance_calculator_tb;
 
 reg clk, rst, ready;
-reg [W-1:0] training_data [0:M-1][0:N-1];
+reg [W-1:0] training_data [0:(M*N)-1];
 reg [W-1:0] training_data_type;
-reg [W-1:0] input_data [0:M-1][0:N-1];
+reg [W-1:0] input_data [0:(M*N)-1];
 wire [W-1:0] distance;
 wire [W-1:0] data_type;
 wire done;
@@ -27,8 +27,8 @@ initial begin
   
   for (integer i=0; i<M; i=i+1) begin
       for (integer j=0; j<N; j=j+1) begin
-        training_data[i][j]=$urandom_range(0,500);
-        input_data[i][j]=$urandom_range(0,500);
+        training_data[i*N + j]=$urandom_range(0,500);
+        input_data[i*N + j]=$urandom_range(0,500);
       end
   end
 
@@ -38,18 +38,18 @@ initial begin
   #500 ready = 1;
   #25 ready = 0;
 
-  #550
+  #2800
   training_data_type = $urandom_range(3,6);
   
   for (integer i=0; i<M; i=i+1) begin
       for (integer j=0; j<N; j=j+1) begin
-        training_data[i][j]= 1;
-        input_data[i][j]=0;
+        training_data[i*N + j]=1;
+        input_data[i*N + j]=0;
       end
   end
 
   ready = 0;
-  #50 ready = 1;
+  #500 ready = 1;
   #25 ready = 0;
 
 end
@@ -62,7 +62,7 @@ begin
   $display("training_data:");
   for (int i = 0; i < M; i = i + 1) begin
     for (int j = 0; j < N; j = j + 1) begin
-      $display("training_data[%0d][%0d] = %0d", i, j, training_data[i][j]);
+      $display("training_data[%0d][%0d] = %0d", i, j, training_data[i*N+j]);
     end
   end
   $display("Training data type: %0d", training_data_type);
@@ -70,14 +70,19 @@ begin
   $display("input_data:");
   for (int i = 0; i < M; i = i + 1) begin
     for (int j = 0; j < N; j = j + 1) begin
-      $display("input_data[%0d][%0d] = %0d", i, j, input_data[i][j]);
+      $display("input_data[%0d][%0d] = %0d", i, j, input_data[i*N+j]);
     end
   end
-  #500;
+  #2800;
   $display("distance = %0f", distance); 
   $display("Data type = %0d", data_type);
 
-  #2000
+ #30000;
+  $display("distance = %0f", distance); 
+  $display("Data type = %0d", data_type);
+
+
+  #500
   $finish;
 end 
 endmodule
