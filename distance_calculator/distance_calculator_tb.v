@@ -5,15 +5,15 @@ module distance_calculator_tb;
 
 reg clk, rst, ready;
 reg [W-1:0] training_data [0:(M*N)-1];
-reg [W-1:0] training_data_type;
+reg [TYPE_W-1:0] training_data_type;
 reg [W-1:0] input_data [0:(M*N)-1];
 wire [W-1:0] distance;
-wire [W-1:0] data_type;
+wire [TYPE_W-1:0] data_type;
 wire done;
 
-parameter M=5, N=10, W=32;
+parameter M=5, N=10, W=32, MAX_ELEMENTS=30, TYPE_W=2;
 
-distance_calculator #(M,N,W) uut(clk, rst, ready, training_data, training_data_type, input_data,distance, data_type, done);
+distance_calculator #(M,N,W,MAX_ELEMENTS,TYPE_W) uut(clk, rst, ready, training_data, training_data_type, input_data,distance, data_type, done, data_request);
 
 // clk generation
 initial begin
