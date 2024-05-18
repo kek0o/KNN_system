@@ -1,6 +1,8 @@
- module sort_2 #(parameter W = 32)(
-   input wire [W-1:0] A, B, A_type, B_type,
-   output wire [W-1:0] H, L, H_type, L_type
+ module sort_2 #(parameter W, TYPE_W)(
+   input wire [W-1:0] A, B,
+   input wire [TYPE_W-1:0] A_type, B_type,
+   output wire [W-1:0] H, L,
+   output wire [TYPE_W-1:0] H_type, L_type
  );
 
   assign a_bigger = A > B;
