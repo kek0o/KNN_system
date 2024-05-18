@@ -34,20 +34,17 @@ always @(posedge clk)
           done <= 1'b0;
           sub <= 0;
           sum <= 0;
-
-          if (ready) begin
-            state <= 2'b01; //CALCULATE
-          end 
+          state <= ready ? 2'b01 : 2'b00;
         end
         2'b01: begin //CALCULATE
-          if ((i < (M*N)) && (i < MAX_ELEMENTS) && (cycle_count < (M*N))) begin
+          if ((i < MAX_ELEMENTS) && (cycle_count < (M*N))) begin
             sub = input_data[i] - training_data[i];
             sum = sum + sub*sub;
             i <= i + 1;
             cycle_count <= cycle_count + 1;
           end else begin
             i <= 0;
-            if ((MAX_ELEMENTS < (M*N)) && (cycle_count < (M*N))) begin
+            if (cycle_count < (M*N)) begin
               data_request <= 1'b1; //request remaining data
               state <= 2'b11; //REQUEST_DATA
             end else begin
@@ -64,11 +61,8 @@ always @(posedge clk)
         end
         2'b11: begin //REQUEST_DATA
           data_request <= 1'b0;
-          if (ready) begin
-            state <= 2'b01; //CALCULATE
-          end
+          state <= ready ? 2'b01 : 2'b11;
         end
-
      endcase
     end
   end
