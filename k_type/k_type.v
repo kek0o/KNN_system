@@ -41,7 +41,7 @@ always @(posedge clk) begin
             j <= j + 1;
           end else begin
             j <= 0;
-            stop = 1'b1;
+            stop <= 1'b1;
           end
         end else begin
           if (j < (1 << TYPE_W)) begin
@@ -49,7 +49,7 @@ always @(posedge clk) begin
             j <= j + 1;
           end else begin
             state <= 2'b10;
-            stop = 1'b0;
+            stop <= 1'b0;
           end
         end
       end

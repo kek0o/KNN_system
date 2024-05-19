@@ -145,13 +145,6 @@ task simple_data_test(input data_stream);
       training_data[i]=training_data_temp[i];
       input_data[i]=input_data_temp[i];
     end
-    ready = 1'b1;
-    @(posedge clk);
-    #1;
-    ready = 1'b0;
-    wait(done);
-    @(posedge clk);
-    #1;
   end else begin
     i = 0;
     j = 0;
@@ -172,15 +165,14 @@ task simple_data_test(input data_stream);
         #1;
       end
     end
-
-    ready = 1'b1;
-    @(posedge clk);
-    #1;
-    ready = 1'b0;
-    wait(done);
-    @(posedge clk);
-    #1;
   end
+  ready = 1'b1;
+  @(posedge clk);
+  #1;
+  ready = 1'b0;
+  wait(done);
+  @(posedge clk);
+  #1;
 endtask
 
 

@@ -26,11 +26,16 @@ reg [W-1:0] distance_array_sorted_sync[0:2*N-1];
 reg [TYPE_W:0] type_array_sorted_sync[0:2*N-1];
 
 
+<<<<<<< HEAD
 reg [W-1:0] distance_array_sorted_temp[0:N-1];
 reg [W-1:0] type_array_sorted_temp[0:N-1];
 
 reg [W-1:0] temp_array[0:N*(N+1)-1];
 reg [TYPE_W-1:0] type_temp_array[0:N*(N+1)-1];
+=======
+wire [W-1:0] temp_array[0:N*(N+1)-1];
+wire [TYPE_W-1:0] type_temp_array[0:N*(N+1)-1];
+>>>>>>> knn_system
 
 generate
   for(i = 0; i < N; i = i + 1) begin

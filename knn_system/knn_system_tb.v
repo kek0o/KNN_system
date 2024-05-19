@@ -1,54 +1,135 @@
 `timescale 1ns/1ps
-`include "knn_system.v"
-`include "distance_sort.v"
-`include "sort_2.v"
-`include "distance_calculator.v"
 
 module knn_system_tb;
 
-reg clk, rst, start, read_done, write_done;
-reg [W-1:0] training_data [0:L-1][0:M-1][0:N-1];
-reg [W-1:0] training_data_type [0:L-1];
-reg [W-1:0] input_data [0:M-1][0:N-1];
-wire [W-1:0] distance_array_sorted [0:L-1];
-wire [W-1:0] type_array_sorted [0:L-1];
-wire read, write;
+reg clk, rst, read_done;
+reg [W-1:0] training_data [0:(M*N)-1];
+reg [TYPE_W-1:0] training_data_type;
+reg [W-1:0] input_data [0:(M*N)-1];
+wire [TYPE_W-1:0] inferred_type;
+wire data_request, done, done_calc, inference_done;
 
-parameter M = 2, N = 3, W = 32, K = 7, L = 15;
+parameter M = 5, N = 10, W = 32, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 32;
 
-knn_system #(M,N,W,K,L) uut(clk, rst, start, read_done, write_done, training_data, training_data_type, input_data, distance_array_sorted, type_array_sorted, read, write);
+reg [W-1:0] training_data_temp [0:(M*N)-1];
+reg [W-1:0] input_data_temp [0:(M*N)-1];
+integer i,j,i_arr;
 
-initial
-begin
-  $dumpfile("knn_system_tb.vcd");
-  $dumpvars;
+knn_system #(M,N,W,MAX_ELEMENTS,TYPE_W,K,L) uut(clk, rst, read_done, training_data, training_data_type, input_data,
+             data_request, done, done_calc, inferred_type, inference_done);
 
-  clk = 0;
+// clk generation
+initial begin
+  clk = 1;
   forever #20 clk = ~clk;
+end
 
-  training_data_type = $urandom_range(0,3);
-  
-  for (integer i=0; i<M; i=i+1) begin
-      for (integer j=0; j<N; j=j+1) begin
-        training_data[i][j]=$urandom_range(0,500);
-        input_data[i][j]=$urandom_range(0,500);
+//task definition
+task set_training_data(input integer matrix_value);
+  for (i=0; i<(M*N); i = i + 1) training_data_temp[i]=matrix_value;
+
+  if (matrix_value < 20) training_data_type = 1;
+  else if (matrix_value < 40) training_data_type = 2;
+  else if (matrix_value < 60) training_data_type = 3;
+  else if (matrix_value < 80) training_data_type = 4;
+  else training_data_type = 5;
+endtask
+
+task set_input_data(input integer matrix_value);
+  for (i=0; i<(M*N); i = i + 1) input_data_temp[i] = matrix_value;
+endtask
+ 
+
+task set_data(input integer matrix_value, input data_stream);
+  set_input_data(matrix_value);
+  i_arr = 0;
+  while (i_arr < L) begin
+    set_training_data($urandom_range(0,100));
+    if (!data_stream) begin // M*N < MAX_ELEMENTS
+      for (integer i=0; i<(M*N); i=i+1) begin
+        training_data[i]=training_data_temp[i];
+        input_data[i]=input_data_temp[i];
       end
+    end else begin
+      i = 0;
+      j = 0;
+      while (i < (M*N)) begin
+        training_data[j] = training_data_temp[i];
+        input_data[j] = input_data_temp[i];
+        i = i + 1;
+        if (j < MAX_ELEMENTS) begin 
+          j = j + 1;
+        end else begin // data burst
+          j = 0;
+          read_done = 1'b1;
+          @(posedge clk);
+          #1;
+          read_done = 1'b0;
+          wait(data_request);
+          @(posedge clk);
+          #1;
+        end
+      end
+    end
+    read_done = 1'b1;
+    i_arr = i_arr + 1;
+    @(posedge clk);
+    #1;
+    read_done = 1'b0;
+    wait(done);
+    @(posedge clk);
+    #1;
   end
+  wait(inference_done);
+  @(posedge clk);
+  #1;
+endtask
 
-  $display("training_data:");
-  for (int i = 0; i < M; i = i + 1) begin
-    for (int j = 0; j < N; j = j + 1) begin
-      $display("training_data[%0d][%0d] = %0d", i, j, training_data[i][j]);
+task display_data();
+  wait(done_calc);
+  $display("Input data:");
+  for (i = 0; i < M; i = i + 1) begin
+    for (j = 0; j < N; j = j + 1) begin
+      $display("input_data[%0d][%0d] = %0d", i, j, input_data_temp[i*N+j]);
     end
   end
-  $display("Training data type: %0d", training_data_type);
+  wait(inference_done);
+  $display("Inferred type = %0d", inferred_type);
+endtask
 
-  $display("input_data:");
-  for (int i = 0; i < M; i = i + 1) begin
-    for (int j = 0; j < N; j = j + 1) begin
-      $display("input_data[%0d][%0d] = %0d", i, j, input_data[i][j]);
-    end
+
+// stimuli generation
+initial begin
+  rst = 1'b1;
+  read_done = 1'b0;
+  #5 rst = 1'b0;
+  @(posedge clk);
+
+  if ((M*N) < MAX_ELEMENTS) begin
+    set_data(25,0);
+    set_data(50,0);
+    set_data(30,0);
+    set_data(100,0);
+  end else begin
+    set_data(25,1);
+    set_data(50,1);
+    set_data(30,1);
+    set_data(100,1);
+
+
   end
 end
 
+initial begin
+  $dumpfile("knn_system_tb.vcd");
+  $dumpvars;
+
+  display_data();
+  display_data();
+  display_data();
+  display_data();
+  
+  #50000;
+  $finish;
+end 
 endmodule
