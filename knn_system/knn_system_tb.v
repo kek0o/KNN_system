@@ -9,7 +9,7 @@ reg [W-1:0] input_data [0:(M*N)-1];
 wire [TYPE_W-1:0] inferred_type;
 wire data_request, done, done_calc, inference_done;
 
-parameter M = 5, N = 10, W = 32, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 32;
+parameter M = 50, N = 10, W = 32, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 64;
 
 reg [W-1:0] training_data_temp [0:(M*N)-1];
 reg [W-1:0] input_data_temp [0:(M*N)-1];
@@ -109,12 +109,14 @@ initial begin
     set_data(25,0);
     set_data(50,0);
     set_data(30,0);
-    set_data(70,0);
+    set_data(10,0);
+    set_data(90,0);
   end else begin
     set_data(25,1);
     set_data(50,1);
     set_data(30,1);
-    set_data(70,1);
+    set_data(10,1);
+    set_data(90,1);
 
 
   end
@@ -128,8 +130,8 @@ initial begin
   display_data();
   display_data();
   display_data();
-  
-  #50000;
+  display_data(); 
+  #500000;
   $finish;
 end 
 endmodule
