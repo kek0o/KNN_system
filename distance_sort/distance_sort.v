@@ -18,8 +18,8 @@ reg [W-1:0] distance_array_sorted_sync[0:2*N-1];
 reg [TYPE_W:0] type_array_sorted_sync[0:2*N-1];
 
 
-reg [W-1:0] temp_array[0:N*(N+1)-1];
-reg [TYPE_W-1:0] type_temp_array[0:N*(N+1)-1];
+wire [W-1:0] temp_array[0:N*(N+1)-1];
+wire [TYPE_W-1:0] type_temp_array[0:N*(N+1)-1];
 
 generate
   for(i = 0; i < N; i = i + 1) begin
