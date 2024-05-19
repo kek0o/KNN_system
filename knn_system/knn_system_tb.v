@@ -109,12 +109,12 @@ initial begin
     set_data(25,0);
     set_data(50,0);
     set_data(30,0);
-    set_data(100,0);
+    set_data(70,0);
   end else begin
     set_data(25,1);
     set_data(50,1);
     set_data(30,1);
-    set_data(100,1);
+    set_data(70,1);
 
 
   end
