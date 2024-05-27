@@ -15,6 +15,7 @@ wire [W-1:0] input_data [0:(M*N)-1];
 wire [W-1:0] training_data [0:(M*N)-1];
 wire [TYPE_W-1:0] training_data_type;
 wire read_done;
+wire idle;
 wire done_calc;
 
 parameter L=64; // number of training matrices
@@ -33,7 +34,7 @@ integer inference_count;
 // module instances
 memory_control #(M,N,W,MAX_ELEMENTS,TYPE_W,L,ADDR_W,BASE_T_ADDR,BASE_I_ADDR) mem_ctrl 
 (clk, rst, start, data_request, done, inferred_type, inference_done, readdata,
-read, readaddress, writedata, write, writeaddress, input_data, training_data, training_data_type, read_done);
+read, readaddress, writedata, write, writeaddress, input_data, training_data, training_data_type, read_done, idle);
 
 knn_system #(M,N,W,MAX_ELEMENTS,TYPE_W,K,L) knn 
 (clk, rst, read_done, training_data, training_data_type, input_data, data_request, done, done_calc, inferred_type, inference_done);

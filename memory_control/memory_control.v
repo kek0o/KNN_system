@@ -15,7 +15,8 @@ module memory_control #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, L, ADDR_W, BASE
   output reg [W-1:0] input_data [0:(M*N)-1],
   output reg [W-1:0] training_data [0:(M*N)-1],
   output reg [TYPE_W-1:0] training_data_type,
-  output reg read_done
+  output reg read_done,
+  output reg idle
 );
 
 reg [3:0] state;
@@ -33,7 +34,12 @@ reg new_request;
 assign data_limit = (MAX_ELEMENTS < (M*N)) ? MAX_ELEMENTS : (M*N);
 assign new_request = done || data_request;
 
-always@(posedge clk)
+always @(state) begin
+  if (state == 4'd0) idle = 1'b1; // signal used for confirming memory control availability
+  else idle = 1'b0;
+end
+
+always @(posedge clk)
 begin 
   if (rst) begin
     read <= 1'b0;
@@ -50,6 +56,7 @@ begin
     done_count <= 0;
     latch_type <= 1'b1;
     latch_input <= 1'b0;
+    idle <= 1'b1;
     training_data_type <= {TYPE_W{1'b0}};
     writeaddress <= BASE_I_ADDR;
     readaddress <= BASE_T_ADDR;
