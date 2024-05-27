@@ -70,7 +70,6 @@ begin
 	  case (state)
 	  	4'd0: begin // IDLE
 	  	  read <= 1'b0;
-        write <= 1'b0;
         read_done <= 1'b0;
         latch_input_done <= 1'b0;
         readaddress <= training_addr;
