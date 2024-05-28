@@ -13,7 +13,7 @@ module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
 );
 // Distance calculator wires
 wire [W-1:0] distance;
-wire [TYPE_W] data_type;
+wire [TYPE_W-1:0] data_type;
 
 // Distance sort registers
 reg [W-1:0] distance_array[0:L-1];
