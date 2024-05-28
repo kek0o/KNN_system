@@ -1,0 +1,8 @@
+knn_test_tb.v
+knn_test.v
+../knn_system/knn_system.v
+../memory_control/memory_control.v
+../distance_calculator/distance_calculator.v
+../distance_sort/distance_sort.v
+../distance_sort/sort_2.v
+../k_type/k_type.v
