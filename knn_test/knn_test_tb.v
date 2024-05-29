@@ -14,7 +14,7 @@ wire [TYPE_W-1:0] inferred_type;
 
 parameter L=128; // number of training matrices
 parameter K=15; // number of neighbours
-parameter M=6, N=10, W=16, TYPE_W = 3, MAX_ELEMENTS=512, ADDR_W=25, BASE_T_ADDR=0;
+parameter M=6, N=10, W=16, TYPE_W = 3, MAX_ELEMENTS=32, ADDR_W=25, BASE_T_ADDR=0;
 parameter BASE_I_ADDR= W*M*N*L+W*L;
 
 
@@ -85,6 +85,8 @@ endtask
 // stimuli generation
 initial begin
   rst = 1'b1;
+  sdram = {W*M*N*(L+10) + W*(L+10){1'b0}};
+  i = 0;
   start_button = 1'b1;
   readdata = 0;
   #5 rst = 1'b0;
