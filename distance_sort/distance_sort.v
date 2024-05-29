@@ -2,101 +2,98 @@ module distance_sort #(parameter N, W, TYPE_W)(
   input wire clk,
   input wire rst,
   input wire done,
-  input wire [W-1:0] distance_array[0:N-1], 
-  input wire [TYPE_W-1:0] type_array[0:N-1],
-  output reg [W-1:0] distance_array_sorted[0:N-1],
-  output reg [TYPE_W-1:0] type_array_sorted[0:N-1],
+  input wire [W*N-1:0] distance_array,
+  input wire [TYPE_W*N-1:0] type_array,
+  output reg [W*N-1:0] distance_array_sorted,
+  output reg [TYPE_W*N-1:0] type_array_sorted,
   output reg valid_sort
 );
 
-genvar i, j;
-reg [1:0] state;
+  genvar i, j;
+  reg [1:0] state;
 
-reg [W-1:0] distance_array_sorted_temp[0:N-1];
-reg [TYPE_W-1:0] type_array_sorted_temp[0:N-1];
-reg [W-1:0] distance_array_sorted_sync[0:2*N-1];
-reg [TYPE_W:0] type_array_sorted_sync[0:2*N-1];
+  reg [W*N-1:0] distance_array_sorted_temp;
+  reg [TYPE_W*N-1:0] type_array_sorted_temp;
+  reg [W*2*N-1:0] distance_array_sorted_sync;
+  reg [TYPE_W*2*N-1:0] type_array_sorted_sync;
 
+  wire [W*N*(N+1)-1:0] temp_array;
+  wire [TYPE_W*N*(N+1)-1:0] type_temp_array;
 
-wire [W-1:0] temp_array[0:N*(N+1)-1];
-wire [TYPE_W-1:0] type_temp_array[0:N*(N+1)-1];
+  generate
+    for (i = 0; i < N; i = i + 1) begin : sorting_network
+      if (i[0] == 1'b0) begin //even elements
+        for (j = 0; j < N; j = j + 2) begin : even_numbers_sorting_network
+          sort_2 #(.W(W), .TYPE_W(TYPE_W)) sort_2_inst (
+            .A(temp_array[(i*N+j+1)*W-1 -: W]), 
+            .B(temp_array[(i*N+j+2)*W-1 -: W]),
+            .A_type(type_temp_array[(i*N+j+1)*TYPE_W-1 -: TYPE_W]), 
+            .B_type(type_temp_array[(i*N+j+2)*TYPE_W-1 -: TYPE_W]),
+            .H(temp_array[(i*N+j+N+1)*W-1 -: W]), 
+            .L(temp_array[(i*N+j+N+2)*W-1 -: W]), 
+            .H_type(type_temp_array[(i*N+j+N+1)*TYPE_W-1 -: TYPE_W]), 
+            .L_type(type_temp_array[(i*N+j+N+2)*TYPE_W-1 -: TYPE_W])
+          );
+        end
+      end else begin
+        assign temp_array[(i*N+N+1)*W-1 -: W] = temp_array[(i*N+1)*W-1 -: W];
+        assign type_temp_array[(i*N+N+1)*TYPE_W-1 -: TYPE_W] = type_temp_array[(i*N+1)*TYPE_W-1 -: TYPE_W];
 
-generate
-  for(i = 0; i < N; i = i + 1) begin
-    if (i[0] == 1'b0) begin //even elements
-      for( j = 0; j < N; j = j + 2)
-        sort_2 #(W, TYPE_W) sort_2_inst (.A(temp_array[i*N+j]), .B(temp_array[i*N+j+1]),.A_type(type_temp_array[i*N+j]), .B_type(type_temp_array[i*N+j+1]),
-      .H(temp_array[i*N+j+N]), .L(temp_array[i*N+j+N+1]), .H_type(type_temp_array[i*N+j+N]), .L_type(type_temp_array[i*N+j+N+1]));
+        for (j = 1; j < N - 2; j = j + 2) begin : odd_numbers_sorting_network
+          sort_2 #(.W(W), .TYPE_W(TYPE_W)) sort_2_inst (
+            .A(temp_array[(i*N+j+1)*W-1 -: W]), 
+            .B(temp_array[(i*N+j+2)*W-1 -: W]),
+            .A_type(type_temp_array[(i*N+j+1)*TYPE_W-1 -: TYPE_W]), 
+            .B_type(type_temp_array[(i*N+j+2)*TYPE_W-1 -: TYPE_W]),
+            .H(temp_array[(i*N+j+N+1)*W-1 -: W]), 
+            .L(temp_array[(i*N+j+N+2)*W-1 -: W]), 
+            .H_type(type_temp_array[(i*N+j+N+1)*TYPE_W-1 -: TYPE_W]), 
+            .L_type(type_temp_array[(i*N+j+N+2)*TYPE_W-1 -: TYPE_W])
+          );
+        end
+
+        assign temp_array[(i*N+N-1+N+1)*W-1 -: W] = temp_array[(i*N+N-1+1)*W-1 -: W];
+        assign type_temp_array[(i*N+N-1+N+1)*TYPE_W-1 -: TYPE_W] = type_temp_array[(i*N+N-1+1)*TYPE_W-1 -: TYPE_W];
+      end
     end
-    else begin
-      assign temp_array[i*N+N] = temp_array[i*N];
-      assign type_temp_array[i*N+N] = type_temp_array[i*N];
 
-      for (j = 1; j < N - 2; j = j + 2)
-        sort_2 #(W, TYPE_W) sort_2_inst (.A(temp_array[i*N+j]), .B(temp_array[i*N+j+1]), .A_type(type_temp_array[i*N+j]), .B_type(type_temp_array[i*N+j+1]),
-      .H(temp_array[i*N+j+N]), .L(temp_array[i*N+j+N+1]), .H_type(type_temp_array[i*N+j+N]), .L_type(type_temp_array[i*N+j+N+1]));
+    for (i = 0; i < N; i = i + 1) begin : array_assignation
+      assign temp_array[(i+1)*W-1 -: W] = distance_array[(i+1)*W-1 -: W];
+      assign type_temp_array[(i+1)*TYPE_W-1 -: TYPE_W] = type_array[(i+1)*TYPE_W-1 -: TYPE_W];
 
-        assign temp_array[i*N+(N-1)+N] = temp_array[i*N+(N-1)];
-        assign type_temp_array[i*N+(N-1)+N] = type_temp_array[i*N+(N-1)];
-
+      assign distance_array_sorted_temp[(i+1)*W-1 -: W] = temp_array[(N*N+i+1)*W-1 -: W];
+      assign type_array_sorted_temp[(i+1)*TYPE_W-1 -: TYPE_W] = type_temp_array[(N*N+i+1)*TYPE_W-1 -: TYPE_W];
     end
-  end
+  endgenerate
 
-  for(i = 0; i < N; i = i + 1) begin
-    assign temp_array[i] = distance_array[i];
-    assign type_temp_array[i] = type_array[i];
-
-    assign distance_array_sorted_temp[i] = temp_array[N*N+i];
-    assign type_array_sorted_temp[i] = type_temp_array[N*N+i];
-
-  end
-endgenerate
-
-integer k;
-reg stability_error;
-
-always @(posedge clk)
-  begin
+  always @(posedge clk) begin
     if (rst) begin
       valid_sort <= 1'b0;
-      stability_error <= 1'b0;
-      for (k = 0; k < N; k = k + 1) begin
-        distance_array_sorted_sync[k] = {W{1'b0}};
-        type_array_sorted_sync[k] = {TYPE_W{1'b0}};
-      end
+      distance_array_sorted_sync <= {2*N*W{1'b0}};
+      type_array_sorted_sync <= {2*N*TYPE_W{1'b0}};
       state <= 2'b00;
     end else begin
       case (state)
         2'b00: begin // SORTING
           valid_sort <= 1'b0;
-          stability_error <= 1'b0;
-          for (k = 0; k < N; k = k + 1) begin
-            distance_array_sorted_sync[k] = {W{1'b0}};
-            type_array_sorted_sync[k] = {TYPE_W{1'b0}};
-          end
+          distance_array_sorted_sync <= {2*N*W{1'b0}};
+          type_array_sorted_sync <= {2*N*TYPE_W{1'b0}};
           state <= done ? 2'b01 : 2'b00;
         end
         2'b01: begin // SYNC_SORT
-          stability_error <= 1'b0;
-          for (k = 0; k < N; k = k + 1) begin
-            distance_array_sorted_sync[k] <= distance_array_sorted_temp[k]; 
-            distance_array_sorted_sync[N + k] <= distance_array_sorted_sync[k]; 
-
-            type_array_sorted_sync[k] <= type_array_sorted_temp[k];
-            type_array_sorted_sync[N + k] <= type_array_sorted_sync[k];
-          end
-        state <= 2'b10;
+          distance_array_sorted_sync <= {distance_array_sorted_sync[W*N-1:0], distance_array_sorted_temp}; 
+          type_array_sorted_sync <= {type_array_sorted_sync[TYPE_W*N-1:0], type_array_sorted_temp}; 
+          state <= 2'b10;
         end
         2'b10: begin // VALIDATING_SORT
-          for (k = 0; k < N; k = k + 1) 
-            if(distance_array_sorted_sync[k] != distance_array_sorted_sync[N + k]) stability_error = 1'b1;
-          state <= stability_error ? 2'b01 : 2'b11;
+          if (distance_array_sorted_sync[W*N-1:0] != distance_array_sorted_sync[2*W*N-1:W*N]) 
+            state <= 2'b01;
+          else 
+            state <= 2'b11;
         end
         2'b11: begin // VALID_SORT
-          for (k = 0; k < N; k = k + 1) begin
-            distance_array_sorted[k] <= distance_array_sorted_sync[k]; 
-            type_array_sorted[k] <= type_array_sorted_sync[k]; 
-          end
+          distance_array_sorted <= distance_array_sorted_sync[W*N-1:0]; 
+          type_array_sorted <= type_array_sorted_sync[TYPE_W*N-1:0]; 
           valid_sort <= 1'b1;
           state <= 2'b00;
         end
