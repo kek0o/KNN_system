@@ -4,6 +4,8 @@
 
 module distance_sort_tb;
 
+  parameter N = 64, W = 32, TYPE_W = 3;
+
   reg clk, rst, done;
   reg [W*N-1:0] distance_array;
   reg [TYPE_W*N-1:0] type_array;
@@ -13,7 +15,6 @@ module distance_sort_tb;
   wire valid_sort;
 
   integer i;
-  parameter N = 64, W = 32, TYPE_W = 3;
 
   distance_sort #(N, W, TYPE_W) uut (
     .clk(clk),
