@@ -10,9 +10,9 @@ module k_type_tb;
   wire inference_done;
   integer i;
 
-  parameter N=10, W=32, K=5, TYPE_W = 4;
+  parameter K=5, TYPE_W = 4;
 
-  k_type #(N, W, K, TYPE_W) uut(clk, rst, valid_sort, k_nearest_neighbours_type, inferred_type, inference_done);
+  k_type #(K, TYPE_W) uut(clk, rst, valid_sort, k_nearest_neighbours_type, inferred_type, inference_done);
 
   // clk generation
   initial begin

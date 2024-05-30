@@ -1,4 +1,4 @@
-module k_type #(parameter N, W, K, TYPE_W)(
+module k_type #(K, TYPE_W)(
   input wire clk,
   input wire rst,
   input wire valid_sort,
