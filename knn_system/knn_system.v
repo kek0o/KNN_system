@@ -37,7 +37,7 @@ module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
     .distance_array_sorted(distance_array_sorted), .type_array_sorted(type_array_sorted), .valid_sort(valid_sort));
 
   // K_type instance
-  k_type #(.N((1<<L)),.W(W),.K(K),.TYPE_W(TYPE_W)) k_type_inst (
+  k_type #(.K(K),.TYPE_W(TYPE_W)) k_type_inst (
     .clk(clk), .rst(rst), .valid_sort(valid_sort), .k_nearest_neighbours_type(k_nearest_neighbours_type),
     .inferred_type(inferred_type), .inference_done(inference_done));
 
@@ -49,7 +49,6 @@ module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
       distance_array <= {W*(1<<L){1'b1}};
       type_array <= {TYPE_W*(1<<L){1'b0}};
     end else begin
-      k_nearest_neighbours_type <= type_array_sorted[TYPE_W*K-1:0];
       if (done) begin
         done_count <= done_count + 1;
         done_calc <= 1'b0;
@@ -63,5 +62,7 @@ module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
       end
     end
   end
+
+  assign k_nearest_neighbours_type = type_array_sorted[TYPE_W*(1<<L)-1:0];
 endmodule
 

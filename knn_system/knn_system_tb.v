@@ -2,7 +2,7 @@
 
 module knn_system_tb;
 
-parameter M = 5, N = 10, W = 32, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 6;
+parameter M = 5, N = 10, W = 32, MAX_ELEMENTS = 64, TYPE_W = 3, K = 7, L = 6;
 
 reg clk, rst, read_done;
 reg [W*M*N-1:0] training_data;
@@ -26,7 +26,7 @@ initial begin
 end
 
 //task definition
-task set_training_data(input integer matrix_value);
+task set_training_data(input [W-1:0] matrix_value);
 begin
   for (i=0; i<(M*N); i = i + 1) training_data_temp[W*(i+1)-1-:W]=matrix_value;
 
@@ -38,7 +38,7 @@ begin
 end
 endtask
 
-task set_input_data(input integer matrix_value);
+task set_input_data(input [W-1:0] matrix_value);
 begin
   for (i=0; i<(M*N); i = i + 1) input_data_temp[W*(i+1)-1-:W] = matrix_value;
 end
