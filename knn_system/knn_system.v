@@ -1,4 +1,4 @@
-module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
+module knn_system #(parameter M = 2, N = 3, W = 16, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 6)(
   input wire clk,
   input wire rst,
   input wire read_done,
