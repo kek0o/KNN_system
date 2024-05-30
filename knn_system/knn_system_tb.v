@@ -3,17 +3,17 @@
 module knn_system_tb;
 
 reg clk, rst, read_done;
-reg [W-1:0] training_data [0:(M*N)-1];
+reg [W*M*N-1:0] training_data;
 reg [TYPE_W-1:0] training_data_type;
-reg [W-1:0] input_data [0:(M*N)-1];
+reg [W*M*N-1:0] input_data;
 wire [TYPE_W-1:0] inferred_type;
 wire data_request, done, done_calc, inference_done;
 
-parameter M = 50, N = 10, W = 32, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 64;
+parameter M = 50, N = 10, W = 32, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 6;
 
-reg [W-1:0] training_data_temp [0:(M*N)-1];
-reg [W-1:0] input_data_temp [0:(M*N)-1];
-integer i,j,i_arr;
+reg [W*M*N-1:0] training_data_temp;
+reg [W*M*N-1:0] input_data_temp;
+integer i, j, i_arr;
 
 knn_system #(M,N,W,MAX_ELEMENTS,TYPE_W,K,L) uut(clk, rst, read_done, training_data, training_data_type, input_data,
              data_request, done, done_calc, inferred_type, inference_done);
@@ -26,7 +26,7 @@ end
 
 //task definition
 task set_training_data(input integer matrix_value);
-  for (i=0; i<(M*N); i = i + 1) training_data_temp[i]=matrix_value;
+  for (i=0; i<(M*N); i = i + 1) training_data_temp[W*(i+1)-:W]=matrix_value;
 
   if (matrix_value < 20) training_data_type = 1;
   else if (matrix_value < 40) training_data_type = 2;
@@ -36,7 +36,7 @@ task set_training_data(input integer matrix_value);
 endtask
 
 task set_input_data(input integer matrix_value);
-  for (i=0; i<(M*N); i = i + 1) input_data_temp[i] = matrix_value;
+  for (i=0; i<(M*N); i = i + 1) input_data_temp[W*(i+1)-:W] = matrix_value;
 endtask
  
 
@@ -46,16 +46,14 @@ task set_data(input integer matrix_value, input data_stream);
   while (i_arr < L) begin
     set_training_data($urandom_range(0,100));
     if (!data_stream) begin // M*N < MAX_ELEMENTS
-      for (integer i=0; i<(M*N); i=i+1) begin
-        training_data[i]=training_data_temp[i];
-        input_data[i]=input_data_temp[i];
-      end
+      training_data = training_data_temp;
+      input_data = input_data_temp;
     end else begin
       i = 0;
       j = 0;
       while (i < (M*N)) begin
-        training_data[j] = training_data_temp[i];
-        input_data[j] = input_data_temp[i];
+        training_data[W*(j+1)-:W] = training_data_temp[W*(i+1)-:W];
+        input_data[W*(j+1)-:W] = input_data_temp[W*(i+1)-:W];
         i = i + 1;
         if (j < MAX_ELEMENTS) begin 
           j = j + 1;
@@ -90,7 +88,7 @@ task display_data();
   $display("Input data:");
   for (i = 0; i < M; i = i + 1) begin
     for (j = 0; j < N; j = j + 1) begin
-      $display("input_data[%0d][%0d] = %0d", i, j, input_data_temp[i*N+j]);
+      $display("input_data[%0d][%0d] = %0d", i, j, input_data_temp[W*(i*N+j+1)-:W]);
     end
   end
   wait(inference_done);
@@ -135,3 +133,4 @@ initial begin
   $finish;
 end 
 endmodule
+
