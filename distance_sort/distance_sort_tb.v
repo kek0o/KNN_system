@@ -1,6 +1,4 @@
 `timescale 10ns/1ns
-`include "distance_sort.v"
-`include "sort_2.v"
 
 module distance_sort_tb;
 
