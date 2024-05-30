@@ -5,11 +5,11 @@ module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
   input wire [W*M*N-1:0] training_data,
   input wire [TYPE_W-1:0] training_data_type,
   input wire [W*M*N-1:0] input_data,
-  output reg data_request,
-  output reg done,
+  output data_request,
+  output done,
   output reg done_calc,
-  output reg [TYPE_W-1:0] inferred_type,
-  output reg inference_done
+  output [TYPE_W-1:0] inferred_type,
+  output inference_done
 );
   // Distance calculator wires
   wire [W-1:0] distance;
@@ -37,7 +37,7 @@ module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
     .distance_array_sorted(distance_array_sorted), .type_array_sorted(type_array_sorted), .valid_sort(valid_sort));
 
   // K_type instance
-  k_type #(.L((1<<L)),.W(W),.K(K),.TYPE_W(TYPE_W)) k_type_inst (
+  k_type #(.N((1<<L)),.W(W),.K(K),.TYPE_W(TYPE_W)) k_type_inst (
     .clk(clk), .rst(rst), .valid_sort(valid_sort), .k_nearest_neighbours_type(k_nearest_neighbours_type),
     .inferred_type(inferred_type), .inference_done(inference_done));
 
