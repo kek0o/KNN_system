@@ -49,7 +49,7 @@ module knn_system #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, K, L)(
       distance_array <= {W*(1<<L){1'b1}};
       type_array <= {TYPE_W*(1<<L){1'b0}};
     end else begin
-      k_nearest_neighbours_type <= type_array_sorted[TYPE_W*(1<<L)-1:0];
+      k_nearest_neighbours_type <= type_array_sorted[TYPE_W*K-1:0];
       if (done) begin
         done_count <= done_count + 1;
         done_calc <= 1'b0;
