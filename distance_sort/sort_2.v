@@ -1,4 +1,4 @@
- module sort_2 #(parameter W, TYPE_W)(
+ module sort_2 #(parameter W = 16, TYPE_W = 3)(
    input wire clk,
    input wire rst,
    input wire in_valid,
@@ -13,6 +13,8 @@
  always @(posedge clk) begin
   if (rst) begin
     out_valid <= 1'b0;
+    out_0 <= {W{1'b0}};
+    out_1 <= {W{1'b0}};
   end else begin
     out_valid <= in_valid;
     if (ascending) begin

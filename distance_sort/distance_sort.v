@@ -1,13 +1,14 @@
-module distance_sort #(parameter L = 32, W = 16, TYPE_W = 3)(
+module distance_sort #(parameter L = 64, W = 16, TYPE_W = 3)(
   input wire clk,
   input wire rst,
   input wire done_calc,
-  input wire [W*(1<<L)-1:0] distance_array
-  input wire [TYPE_W*(1<<L)-1:0] type_array,
-  output reg [W*(1<<L)-1:0] distance_array_sorted,
-  output reg [TYPE_W*(1<<L)-1:0] type_array_sorted,
+  input wire [W*L-1:0] distance_array,
+  input wire [TYPE_W*L-1:0] type_array,
+  output reg [W*L-1:0] distance_array_sorted,
+  output reg [TYPE_W*L-1:0] type_array_sorted,
   output reg valid_sort
 );
+
 reg ascending;
 assign ascending = 1'b1;
 

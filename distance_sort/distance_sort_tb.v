@@ -2,22 +2,22 @@
 
 module distance_sort_tb;
 
-  parameter N = 64, W = 32, TYPE_W = 3;
+  parameter L = 16, W = 32, TYPE_W = 3;
 
-  reg clk, rst, done;
-  reg [W*N-1:0] distance_array;
-  reg [TYPE_W*N-1:0] type_array;
+  reg clk, rst, done_calc;
+  reg [W*L-1:0] distance_array;
+  reg [TYPE_W*L-1:0] type_array;
 
-  wire [W*N-1:0] distance_array_sorted;
-  wire [TYPE_W*N-1:0] type_array_sorted;
+  wire [W*L-1:0] distance_array_sorted;
+  wire [TYPE_W*L-1:0] type_array_sorted;
   wire valid_sort;
 
   integer i;
 
-  distance_sort #(N, W, TYPE_W) uut (
+  distance_sort #(L, W, TYPE_W) uut (
     .clk(clk),
     .rst(rst),
-    .done(done),
+    .done_calc(done_calc),
     .distance_array(distance_array),
     .type_array(type_array),
     .distance_array_sorted(distance_array_sorted),
@@ -34,7 +34,7 @@ module distance_sort_tb;
   // task definition
   task set_input_array(input integer range);
     begin
-      for (i = 0; i < N; i = i + 1) begin
+      for (i = 0; i < L; i = i + 1) begin
         distance_array[(i+1)*W-1 -: W] = $urandom_range(0, range);
         $display("Hola");
         if (distance_array[(i+1)*W-1 -: W] < 20) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 1;
@@ -43,10 +43,10 @@ module distance_sort_tb;
         else if (distance_array[(i+1)*W-1 -: W] < 80) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 4;
         else type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 5;
       end
-      done = 1'b1;
+      done_calc = 1'b1;
       @(posedge clk);
       #1;
-      done = 1'b0;
+      done_calc = 1'b0;
       wait(valid_sort);
       @(posedge clk);
       #1;
@@ -55,7 +55,7 @@ module distance_sort_tb;
 
   task display_array();
     begin
-      wait(done);
+      wait(done_calc);
       $display("distance&type_array = ");
       for (i = 0; i < N; i = i + 1) begin
         $display("%0d, %0d", distance_array[(i+1)*W-1 -: W], type_array[(i+1)*TYPE_W-1 -: TYPE_W]);
@@ -75,7 +75,6 @@ module distance_sort_tb;
     done = 1'b0;
     #5 rst = 1'b0;
     @(posedge clk);
-    $display("Holaa");
 
     set_input_array(100);
   end
@@ -84,7 +83,7 @@ module distance_sort_tb;
     $dumpfile("distance_sort_tb.vcd");
     $dumpvars;
     display_array();
-    #20000 $finish;
+    #200 $finish;
   end
 endmodule
 
