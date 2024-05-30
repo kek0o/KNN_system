@@ -1,15 +1,15 @@
 module distance_sort #(parameter L = 64, W = 16, TYPE_W = 3)(
-  input wire clk,
-  input wire rst,
-  input wire done_calc,
-  input wire [W*L-1:0] distance_array,
-  input wire [TYPE_W*L-1:0] type_array,
-  output reg [W*L-1:0] distance_array_sorted,
-  output reg [TYPE_W*L-1:0] type_array_sorted,
-  output reg valid_sort
+  input clk,
+  input rst,
+  input done_calc,
+  input [W*(1<<L)-1:0] distance_array,
+  input [TYPE_W*(1<<L)-1:0] type_array,
+  output [W*(1<<L)-1:0] distance_array_sorted,
+  output [TYPE_W*(1<<L)-1:0] type_array_sorted,
+  output valid_sort
 );
 
-reg ascending;
+wire ascending;
 assign ascending = 1'b1;
 
 bitonic_sort #(.L(L),.W(W),.TYPE_W(TYPE_W)) bitonic_sort_inst(
