@@ -49,6 +49,7 @@ always @(posedge clk) begin
             cycle_count <= 0;
             done <= 1'b1;
             distance <= sum; //square root avoided for its hardware complexity
+	    data_type <= training_data_type;
             state <= 2'b10; //DONE
           end
         end
@@ -64,8 +65,6 @@ always @(posedge clk) begin
     endcase
   end
 end
-
-assign data_type = training_data_type;
 
 endmodule
 
