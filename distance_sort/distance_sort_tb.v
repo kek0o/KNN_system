@@ -2,14 +2,14 @@
 
 module distance_sort_tb;
 
-  parameter L = 16, W = 32, TYPE_W = 3;
+  parameter L = 5, W = 32, TYPE_W = 3;
 
   reg clk, rst, done_calc;
-  reg [W*L-1:0] distance_array;
-  reg [TYPE_W*L-1:0] type_array;
+  reg [W*(1<<L)-1:0] distance_array;
+  reg [TYPE_W*(1<<L)-1:0] type_array;
 
-  wire [W*L-1:0] distance_array_sorted;
-  wire [TYPE_W*L-1:0] type_array_sorted;
+  wire [W*(1<<L)-1:0] distance_array_sorted;
+  wire [TYPE_W*(1<<L)-1:0] type_array_sorted;
   wire valid_sort;
 
   integer i;
@@ -34,9 +34,8 @@ module distance_sort_tb;
   // task definition
   task set_input_array(input integer range);
     begin
-      for (i = 0; i < L; i = i + 1) begin
+      for (i = 0; i < (1<<L); i = i + 1) begin
         distance_array[(i+1)*W-1 -: W] = $urandom_range(0, range);
-        $display("Hola");
         if (distance_array[(i+1)*W-1 -: W] < 20) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 1;
         else if (distance_array[(i+1)*W-1 -: W] < 40) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 2;
         else if (distance_array[(i+1)*W-1 -: W] < 60) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 3;
@@ -57,13 +56,12 @@ module distance_sort_tb;
     begin
       wait(done_calc);
       $display("distance&type_array = ");
-      for (i = 0; i < N; i = i + 1) begin
+      for (i = 0; i < (1<<L); i = i + 1) begin
         $display("%0d, %0d", distance_array[(i+1)*W-1 -: W], type_array[(i+1)*TYPE_W-1 -: TYPE_W]);
       end
-      #200;
       wait(valid_sort);
       $display("Sorted distance&type_array =");
-      for (i = 0; i < N; i = i + 1) begin
+      for (i = 0; i < (1<<L); i = i + 1) begin
         $display("%0d, %0d", distance_array_sorted[(i+1)*W-1 -: W], type_array_sorted[(i+1)*TYPE_W-1 -: TYPE_W]);
       end
     end
@@ -72,7 +70,10 @@ module distance_sort_tb;
   // stimuli generation
   initial begin
     rst = 1'b1;
-    done = 1'b0;
+    i = 0;
+    distance_array <= {W*(1<<L){1'b0}};
+    type_array <= {W*(1<<L){1'b0}};
+    done_calc = 1'b0;
     #5 rst = 1'b0;
     @(posedge clk);
 
