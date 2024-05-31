@@ -28,7 +28,7 @@ reg [ADDR_W-1:0] training_addr;
 reg [ADDR_W-1:0] input_addr;
 reg [ADDR_W-1:0] inference_addr;
 integer i,j, cycle_count_i, cycle_count_t, done_count;
-reg integer data_limit;
+integer data_limit;
 reg new_request;
 
 assign data_limit = (MAX_ELEMENTS < (M*N)) ? MAX_ELEMENTS : (M*N);
@@ -56,7 +56,6 @@ begin
     done_count <= 0;
     latch_type <= 1'b1;
     latch_input <= 1'b0;
-    idle <= 1'b1;
     training_data_type <= {TYPE_W{1'b0}};
     writeaddress <= BASE_I_ADDR;
     readaddress <= BASE_T_ADDR;
