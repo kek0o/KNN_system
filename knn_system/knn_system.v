@@ -63,6 +63,6 @@ module knn_system #(parameter M = 2, N = 3, W = 16, MAX_ELEMENTS = 32, TYPE_W = 
     end
   end
 
-  assign k_nearest_neighbours_type = type_array_sorted[TYPE_W*(1<<L)-1:0];
+  assign k_nearest_neighbours_type = type_array_sorted[TYPE_W*K-1:0];
 endmodule
 
