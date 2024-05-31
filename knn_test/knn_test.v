@@ -1,4 +1,4 @@
-module knn_test #(parameter M = 6,N = 10,W = 16, MAX_ELEMENTS = 32, TYPE_W = 3, K = 15, L = 64, ADDR_W = 25, BASE_T_ADDR = 0, BASE_I_ADDR = 1<<(ADDR_W-1))(
+module knn_test #(parameter M = 6,N = 10,W = 16, MAX_ELEMENTS = 32, TYPE_W = 3, K = 15, L = 6, ADDR_W = 25, BASE_T_ADDR = 0, BASE_I_ADDR = 1<<(ADDR_W-1))(
   input wire clk,
   input wire rst, 
   input wire start_button,
@@ -19,8 +19,8 @@ reg start, data_request, done;
 wire [W-1:0] wr_data_mem_ctrl;
 wire wr_mem_ctrl;
 wire [ADDR_W-1:0] wr_addr_mem_ctrl;
-wire [W-1:0] input_data [0:(M*N)-1];
-wire [W-1:0] training_data [0:(M*N)-1];
+wire [W*M*N-1:0] input_data;
+wire [W*M*N-1:0] training_data;
 wire [TYPE_W-1:0] training_data_type;
 wire read_done;
 // KNN System signals
@@ -28,7 +28,7 @@ wire done_calc;
 
 // Module instances
 // Memory Control instance
-memory_control #(.M(M),.N(N),.W(W),.MAX_ELEMENTS(MAX_ELEMENTS),.TYPE_W(TYPE_W),.L(L),.ADDR_W(ADDR_W),.BASE_T_ADDR(BASE_T_ADDR),.BASE_I_ADDR(BASE_I_ADDR))
+memory_control #(.M(M),.N(N),.W(W),.MAX_ELEMENTS(MAX_ELEMENTS),.TYPE_W(TYPE_W),.L(1<<L),.ADDR_W(ADDR_W),.BASE_T_ADDR(BASE_T_ADDR),.BASE_I_ADDR(BASE_I_ADDR))
 memory_control_inst (
 .clk(clk),.rst(rst),.start(start),.data_request(data_request),.done(done),.inferred_type(inferred_type),
 .inference_done(inference_done),.readdata(readdata),.read(read),.readaddress(readaddress),.writedata(wr_data_mem_ctrl),
@@ -94,7 +94,7 @@ begin
       end
       2'b10: begin
         if (j == 0) begin
-          if (i < L) begin
+          if (i < (1<<L)) begin
             if (random_value < 20) wr_data_sdram <= 1;
             else if (random_value < 40) wr_data_sdram <= 2;
             else if (random_value < 60) wr_data_sdram <= 3;
@@ -109,7 +109,7 @@ begin
           j <= 0;
           i <= i + 1;
         end
-        if ((i == L-1) && (j == M*N)) address <= BASE_I_ADDR;
+        if ((i == (1<<L)-1) && (j == M*N)) address <= BASE_I_ADDR;
         else address <= address + W;
         state <= 2'b11;
       end
@@ -117,7 +117,7 @@ begin
         if (write_count[3]) begin
           write_count <= 5'b0;
           wr_sdram <= 1'b1;
-          if ((i == L+10) && (j == M*N)) begin // L training elements + 10 input elements
+          if ((i == (1<<L)+10) && (j == M*N)) begin // L training elements + 10 input elements
             sdram_write_complete <= 1'b1;
             state <= 2'b00;
           end else state <= 2'b01;

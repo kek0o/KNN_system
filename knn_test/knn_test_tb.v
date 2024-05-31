@@ -12,13 +12,13 @@ wire [ADDR_W-1:0] writeaddress;
 wire idle, sdram_write_complete, inference_done;
 wire [TYPE_W-1:0] inferred_type;
 
-parameter L=128; // number of training matrices
+parameter L=6; // number of training matrices
 parameter K=15; // number of neighbours
 parameter M=6, N=10, W=16, TYPE_W = 3, MAX_ELEMENTS=32, ADDR_W=25, BASE_T_ADDR=0;
-parameter BASE_I_ADDR= W*M*N*L+W*L;
+parameter BASE_I_ADDR= W*M*N*(1<<L)+W*(1<<L);
 
 
-reg [W*M*N*(L+10) + W*(L+10)-1:0] sdram;
+reg [W*M*N*((1<<L)+10) + W*((1<<L)+10)-1:0] sdram;
 reg set_type;
 reg [W-1:0] matrix_value;
 integer i,j, training_elements;
@@ -66,7 +66,7 @@ endtask
 
 task display_sdram_data();
   i = 0;
-  while (i < (W*M*N*(L+10)+W*(L+10))) begin
+  while (i < (W*M*N*((1<<L)+10)+W*((1<<L)+10))) begin
     $display("Address %0d:", i);
     if (i < BASE_I_ADDR) begin
       $display("Training Type: %0d", sdram[i +: W]);
@@ -85,7 +85,7 @@ endtask
 // stimuli generation
 initial begin
   rst = 1'b1;
-  sdram = {W*M*N*(L+10) + W*(L+10){1'b0}};
+  sdram = {W*M*N*((1<<L)+10) + W*((1<<L)+10){1'b0}};
   i = 0;
   start_button = 1'b1;
   readdata = 0;
