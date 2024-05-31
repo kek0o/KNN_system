@@ -14,7 +14,7 @@ generate begin : sort_recursive_generation
   if (L > 1) begin
     wire [W*(1<<L)-1:0] stage0_rslt;
     wire [TYPE_W*(1<<L)-1:0] stage0_type_rslt;
-    wire stage0_valid;
+    wire [(1<<L)-1:0] stage0_valid;
 
     genvar i;
     for (i = 0; i < (1<<(L-1)); i = i + 1) begin : stage0
@@ -31,14 +31,14 @@ generate begin : sort_recursive_generation
         .out_1(stage0_rslt[W*(i+1+(1<<(L-1)))-1:W*(i+(1<<(L-1)))]),
         .out_0_type(stage0_type_rslt[TYPE_W*(i+1)-1:TYPE_W*i]),
         .out_1_type(stage0_type_rslt[TYPE_W*(i+1+(1<<(L-1)))-1:TYPE_W*(i+(1<<(L-1)))]),
-        .out_valid(stage0_valid)
+        .out_valid(stage0_valid[i])
       );
     end
 
     n_item_bitonic_sorter #(.L(L-1),.W(W),.TYPE_W(TYPE_W)) n_sort_inst_stage10 (
       .clk(clk),
       .rst(rst),
-      .in_valid(stage0_valid),
+      .in_valid(stage0_valid[0]),
       .ascending(ascending),
       .in(stage0_rslt[W*(1<<(L-1))-1:0]),
       .in_type(stage0_type_rslt[TYPE_W*(1<<(L-1))-1:0]),
