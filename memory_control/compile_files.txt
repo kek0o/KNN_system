@@ -3,5 +3,7 @@ memory_control.v
 ../knn_system/knn_system.v
 ../distance_calculator/distance_calculator.v
 ../distance_sort/distance_sort.v
+../distance_sort/bitonic_sort.v
+../distance_sort/n_item_bitonic_sorter.v
 ../distance_sort/sort_2.v
 ../k_type/k_type.v
