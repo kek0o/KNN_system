@@ -12,16 +12,16 @@ module memory_control #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, L, ADDR_W, BASE
   output reg [W-1:0] writedata,
   output reg write,
   output reg [ADDR_W-1:0] writeaddress,
-  output reg [W-1:0] input_data [0:(M*N)-1],
-  output reg [W-1:0] training_data [0:(M*N)-1],
+  output reg [W*M*N-1:0] input_data,
+  output reg [W*M*N-1:0] training_data,
   output reg [TYPE_W-1:0] training_data_type,
   output reg read_done,
   output reg idle
 );
 
 reg [3:0] state;
-reg [W-1:0] training_data_reg [0:(M*N)-1];
-reg [W-1:0] input_data_reg [0:(M*N)-1];
+reg [W*M*N-1:0] training_data_reg;
+reg [W*M*N-1:0] input_data_reg;
 reg [4:0] write_count;
 reg latch_type, latch_input, latch_input_done;
 reg [ADDR_W-1:0] training_addr;
@@ -60,10 +60,8 @@ begin
     training_data_type <= {TYPE_W{1'b0}};
     writeaddress <= BASE_I_ADDR;
     readaddress <= BASE_T_ADDR;
-    for(i = 0; i < (M*N); i = i + 1) begin
-      training_data_reg[i] <= {W{1'b0}};
-      input_data_reg[i] <= {W{1'b0}};
-    end
+    training_data_reg <= {W*M*N{1'b0}};
+    input_data_reg <= {W*M*N{1'b0}};
     j <= 0;
     state <= 4'd0;
   end else begin
@@ -78,10 +76,8 @@ begin
         cycle_count_t <= 0;
         done_count <= 0;
         latch_type <= 1'b1;
-        for(i = 0; i < (M*N); i = i + 1) begin
-          training_data_reg[i] <= {W{1'b0}};
-          input_data_reg[i] <= {W{1'b0}};
-        end
+        training_data_reg <= {W*M*N{1'b0}};
+        input_data_reg <= {W*M*N{1'b0}};
         j <= 0;
         state <= start ? 4'd1 : 4'd0;
 	  	end
@@ -108,7 +104,7 @@ begin
       end
       4'd4: begin // latch input data
         if ((j < data_limit) && (cycle_count_i < (M*N))) begin
-          input_data_reg[j] <= readdata;
+          input_data_reg[W*(j+1)-1-:W] <= readdata;
           input_addr <= input_addr + W;
           j <= j + 1;
           cycle_count_i <= cycle_count_i + 1;
@@ -121,7 +117,7 @@ begin
       end
       4'd5: begin // latch training data
         if ((j < data_limit) && (cycle_count_t < (M*N))) begin
-          training_data_reg[j] <= readdata;
+          training_data_reg[W*(j+1)-1-:W] <= readdata;
           training_addr <= training_addr + W;
           j <= j + 1;
           cycle_count_t <= cycle_count_t + 1;
@@ -133,10 +129,8 @@ begin
         end
       end
       4'd6: begin // send data
-        for (i = 0; i < data_limit; i = i + 1) begin
-          training_data[i] <= training_data_reg[i];
-          input_data[i] <= input_data_reg[i];
-        end
+        training_data <= training_data_reg;
+        input_data <= input_data_reg;
         read_done <= 1'b1;
         state <= 4'd7;
       end

@@ -11,20 +11,20 @@ wire [ADDR_W-1:0] readaddress;
 wire [W-1:0] writedata;
 wire write;
 wire [ADDR_W-1:0] writeaddress;
-wire [W-1:0] input_data [0:(M*N)-1];
-wire [W-1:0] training_data [0:(M*N)-1];
+wire [W*M*N-1:0] input_data;
+wire [W*M*N-1:0] training_data;
 wire [TYPE_W-1:0] training_data_type;
 wire read_done;
 wire idle;
 wire done_calc;
 
-parameter L=64; // number of training matrices
+parameter L=6; // number of training matrices
 parameter K=15; // number of neighbours
 parameter M=6, N=10, W=16, TYPE_W = 3, MAX_ELEMENTS=32, ADDR_W=25, BASE_T_ADDR=0;
-parameter BASE_I_ADDR= W*M*N*L+W*L;
+parameter BASE_I_ADDR= W*M*N*(1<<L)+W*(1<<L);
 
 
-reg [W*M*N*(L+10) + W*(L+10)-1:0] sdram;
+reg [W*M*N*((1<<L)+10) + W*((1<<L)+10)-1:0] sdram;
 reg set_type;
 reg [W-1:0] matrix_value;
 integer i,j, training_elements;
@@ -32,7 +32,7 @@ integer clk_count;
 integer inference_count;
 
 // module instances
-memory_control #(M,N,W,MAX_ELEMENTS,TYPE_W,L,ADDR_W,BASE_T_ADDR,BASE_I_ADDR) mem_ctrl 
+memory_control #(M,N,W,MAX_ELEMENTS,TYPE_W,1<<L,ADDR_W,BASE_T_ADDR,BASE_I_ADDR) mem_ctrl 
 (clk, rst, start, data_request, done, inferred_type, inference_done, readdata,
 read, readaddress, writedata, write, writeaddress, input_data, training_data, training_data_type, read_done, idle);
 
@@ -49,10 +49,10 @@ end
 task set_sdram_data();
   i = 0;
   training_elements = 0;
-  while (i < (W*M*N*(L+10)+W*(L+10))) begin
+  while (i < (W*M*N*((1<<L)+10)+W*((1<<L)+10))) begin
     matrix_value = $urandom_range(0, 100);
     // set type at the first address of each matrix
-    if (training_elements < L) begin
+    if (training_elements < (1<<L)) begin
       if (matrix_value < 20) sdram[i +:W] = 1;
       else if (matrix_value < 40) sdram[i +:W] = 2;
       else if (matrix_value < 60) sdram[i +:W] = 3;
@@ -87,7 +87,7 @@ endtask
 
 task display_sdram_data();
   i = 0;
-  while (i < (W*M*N*(L+10)+W*(L+10))) begin
+  while (i < (W*M*N*((1<<L)+10)+W*((1<<L)+10))) begin
     $display("Address %0d:", i);
     if (i < BASE_I_ADDR) begin
       $display("Training Type: %0d", sdram[i +: W]);
