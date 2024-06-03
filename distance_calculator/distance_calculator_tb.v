@@ -3,7 +3,7 @@
 
 module distance_calculator_tb;
 
-parameter M=6, N=10, W=32, MAX_ELEMENTS=128, TYPE_W=2;
+parameter M=6, N=10, W=32, MAX_ELEMENTS=16, TYPE_W=2;
 
 reg clk, rst, ready;
 reg [W*MAX_ELEMENTS-1:0] training_data;
@@ -27,6 +27,7 @@ end
 
 //task definition
 task load_data(input data_stream);
+begin
   if (!data_stream) begin // M*N < MAX_ELEMENTS
     training_data=training_data_temp;
     input_data=input_data_temp;
@@ -58,27 +59,34 @@ task load_data(input data_stream);
   wait(done);
   @(posedge clk);
   #1;
+end
 endtask;
+
 task set_data(input integer range, input data_stream);
+begin
   training_data_type = $urandom_range(0,3);
   for (integer i=0; i<(M*N); i=i+1) begin
     training_data_temp[(i+1)*W-1-:W]=$urandom_range(0,range);
     input_data_temp[(i+1)*W-1-:W]=$urandom_range(0,range);
   end
   load_data(data_stream);
- endtask
+end
+endtask
 
 task simple_data_test(input data_stream);
+begin
   training_data_type = $urandom_range(0,3);
   for (integer i=0; i<(M*N); i=i+1) begin
     training_data_temp[(i+1)*W-1-:W]=1;
     input_data_temp[(i+1)*W-1-:W]=0;
   end
   load_data(data_stream);
+end
 endtask
 
 
 task display_data();
+begin
   wait(ready);
   $display("Training data:");
   for (int i = 0; i < M; i = i + 1) begin
@@ -96,6 +104,7 @@ task display_data();
   end
   wait(done);
   $display("distance = %0d", distance); 
+end
 endtask
 
 // stimuli generation

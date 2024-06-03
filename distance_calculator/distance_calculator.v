@@ -2,16 +2,16 @@ module distance_calculator #(parameter M, N, W, MAX_ELEMENTS, TYPE_W)(
   input wire clk,
   input wire rst,
   input wire ready,
-  input wire [W*M*N-1:0] training_data,
+  input wire [W*MAX_ELEMENTS-1:0] training_data,
   input wire [TYPE_W-1:0] training_data_type,
-  input wire [W*M*N-1:0] input_data,
+  input wire [W*MAX_ELEMENTS-1:0] input_data,
   output reg [W-1:0] distance,
   output reg [TYPE_W-1:0] data_type,
   output reg done,
   output reg data_request
 );
 
-reg [2:0] state; // 0-IDLE, 1-CALCULATE, 2-DONE, 3-REQUEST_DATA
+reg [2:0] state; // 0-IDLE, 1-CALCULATE, 2-SUM, 3-DONE, 4-REQUEST_DATA
 
 reg [W-1:0] sub, sum;
 integer i, cycle_count;
