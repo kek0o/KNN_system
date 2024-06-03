@@ -12,8 +12,8 @@ module memory_control #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, L, ADDR_W, BASE
   output reg [W-1:0] writedata,
   output reg write,
   output reg [ADDR_W-1:0] writeaddress,
-  output reg [W*M*N-1:0] input_data,
-  output reg [W*M*N-1:0] training_data,
+  output reg [W*MAX_ELEMENTS-1:0] input_data,
+  output reg [W*MAX_ELEMENTS-1:0] training_data,
   output reg [TYPE_W-1:0] training_data_type,
   output reg read_done,
   output reg idle
@@ -88,8 +88,12 @@ begin
         else readaddress <= training_addr;
         state <= 4'd2;
       end
-      4'd2: begin
+      4'd2: begin // read activation
         read <= 1'b0;
+        state <= 4'd13;
+      end
+      4'd13: state <= 4'd14; // clk delay
+      4'd14: begin // select latch
         if (latch_type) state <= 4'd3;
         else state <= latch_input ? 4'd4 : 4'd5;
       end
