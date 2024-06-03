@@ -19,8 +19,8 @@ reg start, data_request, done;
 wire [W-1:0] wr_data_mem_ctrl;
 wire wr_mem_ctrl;
 wire [ADDR_W-1:0] wr_addr_mem_ctrl;
-wire [W*M*N-1:0] input_data;
-wire [W*M*N-1:0] training_data;
+wire [W*MAX_ELEMENTS-1:0] input_data;
+wire [W*MAX_ELEMENTS-1:0] training_data;
 wire [TYPE_W-1:0] training_data_type;
 wire read_done;
 // KNN System signals
