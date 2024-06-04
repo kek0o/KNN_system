@@ -12,9 +12,9 @@ wire [ADDR_W-1:0] writeaddress;
 wire idle, sdram_write_complete, inference_done;
 wire [TYPE_W-1:0] inferred_type;
 
-parameter L=6; // number of training matrices
-parameter K=8; // number of neighbours
-parameter M=6, N=10, W=16, TYPE_W = 3, MAX_ELEMENTS=32, ADDR_W=25, BASE_T_ADDR=0;
+parameter L=5; // number of training matrices
+parameter K=6; // number of neighbours
+parameter M=3, N=2, W=16, TYPE_W = 3, MAX_ELEMENTS=16, ADDR_W=25, BASE_T_ADDR=0;
 parameter BASE_I_ADDR= W*M*N*(1<<L)+W*(1<<L);
 
 
@@ -39,9 +39,13 @@ end
 //task definition
 
 task read_sdram();
-  @(posedge clk);
+begin
+  @(posedge clk); // read activation
+  @(posedge clk); // CAS Latency 1
+  @(posedge clk); // CAS Latency 2
   readdata = sdram[readaddress +:W];
   #1;
+end
 endtask
 
 task write_sdram();
