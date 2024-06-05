@@ -2,7 +2,7 @@
 
 module knn_system_tb;
 
-parameter M = 5, N = 10, W = 32, MAX_ELEMENTS = 16, TYPE_W = 3, K = 7, L = 6;
+parameter M = 5, N = 10, W = 32, MAX_ELEMENTS = 32, TYPE_W = 3, K = 7, L = 6;
 
 reg clk, rst, read_done;
 reg [W*MAX_ELEMENTS-1:0] training_data;

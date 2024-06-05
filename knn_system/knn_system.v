@@ -16,14 +16,14 @@ module knn_system #(parameter M = 2, N = 3, W = 16, MAX_ELEMENTS = 32, TYPE_W = 
   wire [TYPE_W-1:0] data_type;
 
   // Distance sort registers
-  reg [W*(1<<L)-1:0] distance_array; // Packed array
-  reg [TYPE_W*(1<<L)-1:0] type_array; // Packed array
-  wire [W*(1<<L)-1:0] distance_array_sorted; // Packed array
-  wire [TYPE_W*(1<<L)-1:0] type_array_sorted; // Packed array
+  reg [W*(1<<L)-1:0] distance_array; 
+  reg [TYPE_W*(1<<L)-1:0] type_array; 
+  wire [W*(1<<L)-1:0] distance_array_sorted; 
+  wire [TYPE_W*(1<<L)-1:0] type_array_sorted;
   wire valid_sort;
 
   // K-type registers
-  reg [TYPE_W*K-1:0] k_nearest_neighbours_type; // Packed array
+  wire [TYPE_W*K-1:0] k_nearest_neighbours_type; 
 
   // Module instances
   // Distance calculator instance
