@@ -3,19 +3,20 @@ module knn_test #(parameter M = 6,N = 10,W = 16, MAX_ELEMENTS = 32, TYPE_W = 3, 
   input wire rst, 
   input wire start_button,
   input wire [W-1:0] readdata,
-  output reg read,
-  output reg [ADDR_W-1:0] readaddress,
-  output reg [W-1:0] writedata,
-  output reg write,
-  output reg [ADDR_W-1:0] writeaddress,
-  output reg idle,
+  output wire read,
+  output wire [ADDR_W-1:0] readaddress,
+  output wire [W-1:0] writedata,
+  output wire write,
+  output wire [ADDR_W-1:0] writeaddress,
+  output wire idle,
   output reg sdram_write_complete,
-  output reg inference_done,
-  output reg [TYPE_W-1:0] inferred_type
+  output wire inference_done,
+  output wire [TYPE_W-1:0] inferred_type
 );
 
 // Memory control signals
-reg start, data_request, done;
+reg start;
+wire data_request, done;
 wire [W-1:0] wr_data_mem_ctrl;
 wire wr_mem_ctrl;
 wire [ADDR_W-1:0] wr_addr_mem_ctrl;

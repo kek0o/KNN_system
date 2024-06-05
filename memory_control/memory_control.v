@@ -28,8 +28,8 @@ reg [ADDR_W-1:0] training_addr;
 reg [ADDR_W-1:0] input_addr;
 reg [ADDR_W-1:0] inference_addr;
 integer i,j, cycle_count_i, cycle_count_t, done_count;
-integer data_limit;
-reg new_request;
+wire [31:0] data_limit;
+wire new_request;
 
 assign data_limit = (MAX_ELEMENTS < (M*N)) ? MAX_ELEMENTS : (M*N);
 assign new_request = done || data_request;
