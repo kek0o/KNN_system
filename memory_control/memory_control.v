@@ -106,29 +106,36 @@ begin
         state <= 4'd1;
       end
       4'd4: begin // latch input data
-        if ((j < data_limit) && (cycle_count_i < (M*N))) begin
-          input_data_reg[W*(j+1)-1-:W] <= readdata;
-          input_addr <= input_addr + W;
+        input_data_reg[W*(j+1)-1-:W] <= readdata;
+        input_addr <= input_addr + W; 
+
+        if ((j < data_limit-1) && (cycle_count_i < (M*N-1))) begin
           j <= j + 1;
-          cycle_count_i <= cycle_count_i + 1;
         end else begin
           j <= 0;
           latch_input <= 1'b0;
-          if (cycle_count_i == (M*N)) cycle_count_i <= 0;
         end
+        cycle_count_i <= (cycle_count_i == (M*N-1)) ? 0 : cycle_count_i + 1;
         state <= 4'd1;
       end
       4'd5: begin // latch training data
-        if ((j < data_limit) && (cycle_count_t < (M*N))) begin
-          training_data_reg[W*(j+1)-1-:W] <= readdata;
-          training_addr <= training_addr + W;
+        training_data_reg[W*(j+1)-1-:W] <= readdata;
+        training_addr <= training_addr + W;
+
+        if ((j < data_limit-1) && (cycle_count_t < (M*N-1))) begin
           j <= j + 1;
-          cycle_count_t <= cycle_count_t + 1;
           state <= 4'd1;
         end else begin
           j <= 0;
-          if (cycle_count_t == (M*N)) cycle_count_t <= 0;
           state <= 4'd6;
+        end
+        cycle_count_t <= (cycle_count_t == (M*N-1)) ? 0 : cycle_count_t + 1;
+      end
+      4'd15: begin
+        if (cycle_count_t == 0) begin
+          state <= 4'd6;
+        end else begin
+          state <= 4'd1;
         end
       end
       4'd6: begin // send data
@@ -137,14 +144,13 @@ begin
         read_done <= 1'b1;
         state <= 4'd7;
       end
-      4'd7: begin // wait calculation
+      4'd7: begin // wait calculation/new_request
         read_done <= 1'b0;
-        if (done) done_count = done_count + 1;
-
-        if (done_count < L) begin
+        if (done_count < L-1) begin
           if (new_request) begin
             if (data_request) latch_input <= 1'b1;
             else begin
+              done_count <= done_count + 1'b1;
               if (data_limit < (M*N)) input_addr <= inference_addr + W;
               else latch_input_done <= 1'b1;
               latch_type <= 1'b1;
@@ -152,8 +158,15 @@ begin
             state <= 4'd1;
           end else state <= 4'd7;
         end else begin
-          done_count <= 0;
-          state <= 4'd8;
+          if (new_request) begin
+            if (data_request) begin
+              latch_input <= 1'b1;
+              state <= 4'd1;
+            end else begin
+              done_count <= 0;
+              state <= 4'd8;
+            end
+          end
         end
       end
       4'd8: begin // wait inference

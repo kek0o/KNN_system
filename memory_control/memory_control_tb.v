@@ -20,7 +20,7 @@ wire done_calc;
 
 parameter L=6; // number of training matrices
 parameter K=8; // number of neighbours
-parameter M=6, N=2, W=16, TYPE_W = 3, MAX_ELEMENTS=32, ADDR_W=25, BASE_T_ADDR=0;
+parameter M=6, N=3, W=16, TYPE_W = 3, MAX_ELEMENTS=8, ADDR_W=25, BASE_T_ADDR=0;
 parameter BASE_I_ADDR= W*M*N*(1<<L)+W*(1<<L);
 
 
@@ -147,7 +147,6 @@ initial begin
   clk_count = 0;
   set_sdram_data();
   display_sdram_data();
-  
   @(posedge finish);
   #1000;
   display_sdram_data();
