@@ -30,12 +30,12 @@ module k_type #(K, TYPE_W)(
           inference_done <= 1'b0;
           max_type <= 0;
           count <= {32*(1<<TYPE_W){1'b0}};
-          index <= {TYPE_W{1'b0}};
           j <= 0;
           if (valid_sort) begin
             index <= k_nearest_neighbours_type[(j+1)*TYPE_W-1-:TYPE_W];
             state <= 2'b01;
-          end
+          end else index <= {TYPE_W{1'b0}};
+
         end
         2'b01: begin // INFER
           if (!stop) begin
