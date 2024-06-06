@@ -12,13 +12,13 @@ module knn_system #(parameter M = 2, N = 3, W = 16, MAX_ELEMENTS = 32, TYPE_W = 
   output inference_done
 );
   // Distance calculator wires
-  wire [W-1:0] distance;
+  wire [2*W-1:0] distance;
   wire [TYPE_W-1:0] data_type;
 
   // Distance sort registers
-  reg [W*(1<<L)-1:0] distance_array; 
+  reg [2*W*(1<<L)-1:0] distance_array; 
   reg [TYPE_W*(1<<L)-1:0] type_array; 
-  wire [W*(1<<L)-1:0] distance_array_sorted; 
+  wire [2*W*(1<<L)-1:0] distance_array_sorted; 
   wire [TYPE_W*(1<<L)-1:0] type_array_sorted;
   wire valid_sort;
 
@@ -32,7 +32,7 @@ module knn_system #(parameter M = 2, N = 3, W = 16, MAX_ELEMENTS = 32, TYPE_W = 
     .input_data(input_data), .distance(distance), .data_type(data_type), .done(done), .data_request(data_request));
 
   // Distance sort instance
-  distance_sort #(.L(L),.W(W),.TYPE_W(TYPE_W)) distance_sort_inst (
+  distance_sort #(.L(L),.W(2*W),.TYPE_W(TYPE_W)) distance_sort_inst (
     .clk(clk), .rst(rst), .done_calc(done_calc), .distance_array(distance_array), .type_array(type_array), 
     .distance_array_sorted(distance_array_sorted), .type_array_sorted(type_array_sorted), .valid_sort(valid_sort));
 
@@ -46,13 +46,13 @@ module knn_system #(parameter M = 2, N = 3, W = 16, MAX_ELEMENTS = 32, TYPE_W = 
     if (rst) begin
       done_calc <= 1'b0;
       done_count <= 0;
-      distance_array <= {W*(1<<L){1'b1}};
+      distance_array <= {2*W*(1<<L){1'b1}};
       type_array <= {TYPE_W*(1<<L){1'b0}};
     end else begin
       if (done) begin
         done_count <= done_count + 1;
         done_calc <= 1'b0;
-        distance_array[(done_count+1)*W-1 -: W] <= distance;
+        distance_array[(done_count+1)*2*W-1 -: 2*W] <= distance;
         type_array[(done_count+1)*TYPE_W-1 -: TYPE_W] <= data_type;
       end
       if (done_count < (1<<L)) done_calc <= 1'b0;

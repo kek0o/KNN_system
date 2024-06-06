@@ -9,7 +9,7 @@ reg clk, rst, ready;
 reg [W*MAX_ELEMENTS-1:0] training_data;
 reg [TYPE_W-1:0] training_data_type;
 reg [W*MAX_ELEMENTS-1:0] input_data;
-wire [W-1:0] distance;
+wire [2*W-1:0] distance;
 wire [TYPE_W-1:0] data_type;
 wire done;
 

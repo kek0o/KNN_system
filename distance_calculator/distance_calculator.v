@@ -5,7 +5,7 @@ module distance_calculator #(parameter M, N, W, MAX_ELEMENTS, TYPE_W)(
   input wire [W*MAX_ELEMENTS-1:0] training_data,
   input wire [TYPE_W-1:0] training_data_type,
   input wire [W*MAX_ELEMENTS-1:0] input_data,
-  output reg [W-1:0] distance,
+  output reg [2*W-1:0] distance,
   output reg [TYPE_W-1:0] data_type,
   output reg done,
   output reg data_request
@@ -13,12 +13,12 @@ module distance_calculator #(parameter M, N, W, MAX_ELEMENTS, TYPE_W)(
 
 reg [2:0] state; // 0-IDLE, 1-CALCULATE, 2-SUM, 3-DONE, 4-REQUEST_DATA
 
-reg [W-1:0] sub, sum;
+reg [2*W-1:0] sub, sum;
 integer i, cycle_count;
 
 always @(posedge clk) begin
   if (rst) begin
-    distance <= {1'b0, {(W-1){1'b1}}}; //max distance possible (signed)
+    distance <= {1'b0, {(2*W-1){1'b1}}}; //max distance possible (signed)
     done <= 1'b0;
     data_request <= 1'b0;
     sum <= 0;
