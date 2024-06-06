@@ -59,8 +59,8 @@ begin
     training_data_type <= {TYPE_W{1'b0}};
     writeaddress <= BASE_I_ADDR;
     readaddress <= BASE_T_ADDR;
-    training_data_reg <= {W*M*N{1'b0}};
-    input_data_reg <= {W*M*N{1'b0}};
+    training_data_reg <= {W*MAX_ELEMENTS{1'b0}};
+    input_data_reg <= {W*MAX_ELEMENTS{1'b0}};
     j <= 0;
     state <= 4'd0;
   end else begin
@@ -75,8 +75,8 @@ begin
         cycle_count_t <= 0;
         done_count <= 0;
         latch_type <= 1'b1;
-        training_data_reg <= {W*M*N{1'b0}};
-        input_data_reg <= {W*M*N{1'b0}};
+        training_data_reg <= {W*MAX_ELEMENTS{1'b0}};
+        input_data_reg <= {W*MAX_ELEMENTS{1'b0}};
         j <= 0;
         state <= start ? 4'd1 : 4'd0;
 	  	end

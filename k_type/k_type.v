@@ -10,8 +10,8 @@ module k_type #(K, TYPE_W)(
   reg [1:0] state;
   reg stop;
   reg [32*(1<<TYPE_W)-1:0] count; // 2^TYPE_W
-  integer max_type;
-  integer i, j;
+  reg [TYPE_W-1:0] max_type;
+  reg [TYPE_W:0] j;
   reg [TYPE_W-1:0] index;
 
   always @(posedge clk) begin
@@ -42,7 +42,7 @@ module k_type #(K, TYPE_W)(
             count[32*(index+1)-1-:32] <= count[32*(index+1)-1-:32] + 1;
             index <= k_nearest_neighbours_type[(j+1)*TYPE_W-1-:TYPE_W];
             if (j < K) begin
-              j <= j + 1;
+              j <= j + 1'b1;
             end else begin
               j <= 0;
               stop <= 1'b1;
@@ -50,7 +50,7 @@ module k_type #(K, TYPE_W)(
           end else begin
             if (j < (1 << TYPE_W)) begin
               if (count[32*(j+1)-1-:32] > count[32*(max_type+1)-1-:32]) max_type <= j;
-              j <= j + 1;
+              j <= j + 1'b1;
             end else begin
               state <= 2'b10;
               stop <= 1'b0;
