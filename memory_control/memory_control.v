@@ -20,8 +20,8 @@ module memory_control #(parameter M, N, W, MAX_ELEMENTS, TYPE_W, L, ADDR_W, BASE
 );
 
 reg [3:0] state;
-reg [W*M*N-1:0] training_data_reg;
-reg [W*M*N-1:0] input_data_reg;
+reg [W*MAX_ELEMENTS-1:0] training_data_reg;
+reg [W*MAX_ELEMENTS-1:0] input_data_reg;
 reg [4:0] write_count;
 reg latch_type, latch_input, latch_input_done;
 reg [ADDR_W-1:0] training_addr;
