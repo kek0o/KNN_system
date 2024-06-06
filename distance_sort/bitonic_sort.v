@@ -32,7 +32,7 @@ generate begin : sorting_network
       .clk(clk),
       .rst(rst),
       .in_valid(in_valid),
-      .ascending(~ascending), // descending
+      .ascending(!ascending), // descending
       .in(in[W*(1<<L)-1:W*(1<<(L-1))]),
       .in_type(in_type[TYPE_W*(1<<L)-1:TYPE_W*(1<<(L-1))]),
       .out(stage0_rslt[W*(1<<L)-1:W*(1<<(L-1))]),

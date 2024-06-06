@@ -72,6 +72,8 @@ begin
     wr_data_sdram <= 0;
     state <= 2'd0;
   end else begin
+    pre_button <= {pre_button[0], start_button};
+		start <= !pre_button[0] && pre_button[1];
     case (state)
       2'b00: begin
         lfsr <= 7'b1;
@@ -80,8 +82,6 @@ begin
         wr_sdram <= 1'b0;
         i <= 0;
         j <= 0;
-        pre_button <= {pre_button[0], start_button};
-		    start <= !pre_button[0] && pre_button[1];
         state <= sdram_write_complete ? 2'b00 : 2'b01;
       end
       2'b01: begin
@@ -127,7 +127,7 @@ begin
     endcase
   end
 end
-assign writeaddress = !sdram_write_complete ? wr_addr_sdram : wr_addr_mem_ctrl;
-assign writedata = !sdram_write_complete ? wr_data_sdram : wr_data_mem_ctrl;
-assign write = !sdram_write_complete ? wr_sdram : wr_mem_ctrl;
+assign writeaddress = sdram_write_complete ? wr_addr_mem_ctrl : wr_addr_sdram ;
+assign writedata = sdram_write_complete ? wr_data_mem_ctrl : wr_data_sdram;
+assign write = sdram_write_complete ? wr_mem_ctrl : wr_sdram;
 endmodule
