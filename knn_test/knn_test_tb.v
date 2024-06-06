@@ -12,9 +12,9 @@ wire [ADDR_W-1:0] writeaddress;
 wire idle, sdram_write_complete, inference_done;
 wire [TYPE_W-1:0] inferred_type;
 
-parameter L=4; // number of training matrices
-parameter K=3; // number of neighbours
-parameter M=2, N=2, W=16, TYPE_W = 3, MAX_ELEMENTS=8, ADDR_W=25, BASE_T_ADDR=0;
+parameter L=5; // number of training matrices
+parameter K=8; // number of neighbours
+parameter M=6, N=4, W=16, TYPE_W = 3, MAX_ELEMENTS=16, ADDR_W=25, BASE_T_ADDR=0;
 parameter BASE_I_ADDR= W*M*N*(1<<L)+W*(1<<L);
 
 
