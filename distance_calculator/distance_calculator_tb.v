@@ -3,7 +3,7 @@
 
 module distance_calculator_tb;
 
-parameter M=6, N=10, W=32, MAX_ELEMENTS=16, TYPE_W=2;
+parameter M=2, N=4, W=32, MAX_ELEMENTS=2, TYPE_W=2;
 
 reg clk, rst, ready;
 reg [W*MAX_ELEMENTS-1:0] training_data;

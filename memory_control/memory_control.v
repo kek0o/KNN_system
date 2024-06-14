@@ -131,13 +131,6 @@ begin
         end
         cycle_count_t <= (cycle_count_t == (M*N-1)) ? 0 : cycle_count_t + 1;
       end
-      4'd15: begin
-        if (cycle_count_t == 0) begin
-          state <= 4'd6;
-        end else begin
-          state <= 4'd1;
-        end
-      end
       4'd6: begin // send data
         training_data <= training_data_reg;
         input_data <= input_data_reg;
@@ -156,7 +149,7 @@ begin
               latch_type <= 1'b1;
             end
             state <= 4'd1;
-          end else state <= 4'd7;
+          end
         end else begin
           if (new_request) begin
             if (data_request) begin
@@ -178,7 +171,7 @@ begin
           input_addr <= input_addr + W; // skip input type
           training_addr <= BASE_T_ADDR; // start reading training data again
           state <= 4'd9;
-        end else state <= 4'd8;
+        end
       end
       4'd9: begin // write inferred type
         if (write_count[3]) begin
@@ -187,7 +180,7 @@ begin
           state <= 4'd10;
         end else write_count <= write_count + 5'b1;
       end
-      4'd10: begin 
+      4'd10: begin // write activation 
         write <= 1'b0;
         state <= 4'd11;
       end

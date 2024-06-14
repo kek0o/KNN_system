@@ -102,7 +102,7 @@ end
 
 always @(posedge read) read_sdram();
 always @(posedge write) write_sdram();
-always @(posedge idle) if (sdram_write_complete) simulate_button();
+always @(posedge idle) if (inference_count < 10) if (sdram_write_complete) simulate_button();
 
 always @(posedge inference_done) begin
   inference_count = inference_count + 1;
@@ -121,7 +121,7 @@ initial begin
   wait(inference_count == 10);
   wait (idle);
   display_sdram_data();
-  #100;
+  #200000;
   $finish;
 end 
 endmodule

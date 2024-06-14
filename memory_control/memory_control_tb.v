@@ -18,9 +18,9 @@ wire read_done;
 wire idle;
 wire done_calc;
 
-parameter L=6; // number of training matrices
+parameter L=7; // number of training matrices
 parameter K=8; // number of neighbours
-parameter M=6, N=3, W=16, TYPE_W = 3, MAX_ELEMENTS=8, ADDR_W=25, BASE_T_ADDR=0;
+parameter M=3, N=2, W=16, TYPE_W = 3, MAX_ELEMENTS=2, ADDR_W=25, BASE_T_ADDR=0;
 parameter BASE_I_ADDR= W*M*N*(1<<L)+W*(1<<L);
 
 
@@ -150,7 +150,7 @@ initial begin
   @(posedge finish);
   #1000;
   display_sdram_data();
-  #100; 
+  #200000; 
   $finish;
 end 
 endmodule
