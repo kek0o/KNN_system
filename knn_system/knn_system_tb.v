@@ -144,7 +144,7 @@ initial begin
   display_data();
   display_data();
   display_data(); 
-  #20000;
+  #200000;
   $finish;
 end 
 endmodule
