@@ -1,5 +1,6 @@
-knn_system_tb.v
-knn_system.v
+memory_control_tb.v
+memory_control.v
+../knn_system/knn_system.v
 ../distance_calculator/distance_calculator.v
 ../distance_sort/distance_sort.v
 ../distance_sort/bitonic_sort.v

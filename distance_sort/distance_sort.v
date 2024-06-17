@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 module distance_sort #(parameter N, W)(
 =======
 module distance_sort #(parameter N, W, TYPE_W)(
@@ -15,16 +16,35 @@ module distance_sort #(parameter N, W, TYPE_W)(
   output reg [TYPE_W-1:0] type_array_sorted[0:N-1],
 >>>>>>> knn_system
   output reg valid_sort
+=======
+module distance_sort #(parameter L = 64, W = 16, TYPE_W = 3)(
+  input clk,
+  input rst,
+  input done_calc,
+  input [W*(1<<L)-1:0] distance_array,
+  input [TYPE_W*(1<<L)-1:0] type_array,
+  output [W*(1<<L)-1:0] distance_array_sorted,
+  output [TYPE_W*(1<<L)-1:0] type_array_sorted,
+  output valid_sort
+>>>>>>> packed_implementation
 );
 
-genvar i, j;
-reg [1:0] state;
+wire ascending;
+assign ascending = 1'b1;
 
-reg [W-1:0] distance_array_sorted_temp[0:N-1];
-reg [TYPE_W-1:0] type_array_sorted_temp[0:N-1];
-reg [W-1:0] distance_array_sorted_sync[0:2*N-1];
-reg [TYPE_W:0] type_array_sorted_sync[0:2*N-1];
+bitonic_sort #(.L(L),.W(W),.TYPE_W(TYPE_W)) bitonic_sort_inst(
+  .clk(clk),
+  .rst(rst),
+  .in_valid(done_calc),
+  .ascending(ascending),
+  .in(distance_array),
+  .in_type(type_array),
+  .out(distance_array_sorted),
+  .out_type(type_array_sorted),
+  .out_valid(valid_sort)
+);
 
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 reg [W-1:0] distance_array_sorted_temp[0:N-1];
@@ -143,5 +163,6 @@ always @(posedge clk)
     end
   end
 >>>>>>> knn_system
+=======
+>>>>>>> packed_implementation
 endmodule
-

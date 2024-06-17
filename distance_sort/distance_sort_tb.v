@@ -1,9 +1,8 @@
 `timescale 10ns/1ns
-`include "distance_sort.v"
-`include "sort_2.v"
 
 module distance_sort_tb;
 
+<<<<<<< HEAD
 reg clk, rst, done;
 <<<<<<< HEAD
 reg [B-1:0] distance_array[0:N-1];
@@ -19,10 +18,19 @@ wire [W-1:0] distance_array_sorted[0:N-1];
 wire [TYPE_W-1:0] type_array_sorted[0:N-1];
 >>>>>>> knn_system
 wire valid_sort;
+=======
+  parameter L = 5, W = 32, TYPE_W = 3;
 
-integer i;
-parameter N = 100, W = 32, TYPE_W = 3;
+  reg clk, rst, done_calc;
+  reg [W*(1<<L)-1:0] distance_array;
+  reg [TYPE_W*(1<<L)-1:0] type_array;
+>>>>>>> packed_implementation
 
+  wire [W*(1<<L)-1:0] distance_array_sorted;
+  wire [TYPE_W*(1<<L)-1:0] type_array_sorted;
+  wire valid_sort;
+
+<<<<<<< HEAD
 <<<<<<< HEAD
 distance_sort #(N, B) uut(clk, rst, done, distance_array, type_array, distance_array_sorted, type_array_sorted, valid_sort);
 =======
@@ -98,49 +106,64 @@ initial begin
   $finish;
 =======
 end
+=======
+  integer i;
 
-// task definition
-task set_input_array(input integer range);
-  for (i = 0; i < N; i = i + 1) begin 
-    distance_array[i] = $urandom_range(0,range);
-    
-    if (distance_array[i] < 20) type_array[i] = 1;
-    else if (distance_array[i] < 40) type_array[i] = 2;
-    else if (distance_array[i] < 60) type_array[i] = 3;
-    else if (distance_array[i] < 80) type_array[i] = 4;
-    else type_array[i] = 5;
+  distance_sort #(L, W, TYPE_W) uut (
+    .clk(clk),
+    .rst(rst),
+    .done_calc(done_calc),
+    .distance_array(distance_array),
+    .type_array(type_array),
+    .distance_array_sorted(distance_array_sorted),
+    .type_array_sorted(type_array_sorted),
+    .valid_sort(valid_sort)
+  );
+>>>>>>> packed_implementation
+
+  // clk generation
+  initial begin
+    clk = 1;
+    forever #20 clk = ~clk;
   end
-  done = 1'b1;
-  @(posedge clk);
-  #1;
-  done = 1'b0;
-  wait (valid_sort);
-  @(posedge clk);
-  #1;
-endtask
 
-task display_array();
-  wait(done);
-  $display("distance&type_array = ");
-  for ( i = 0; i < N; i = i + 1) $display("%0d, %0d, ", distance_array[i], type_array[i]);
-  #200
-  wait(valid_sort);
-  $display("Sorted distance&type_array =");
-  for ( i = 0; i < N; i = i + 1) $display("%0d, %0d, ", distance_array_sorted[i], type_array_sorted[i]);
-endtask
+  // task definition
+  task set_input_array(input integer range);
+    begin
+      for (i = 0; i < (1<<L); i = i + 1) begin
+        distance_array[(i+1)*W-1 -: W] = $urandom_range(0, range);
+        if (distance_array[(i+1)*W-1 -: W] < 20) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 1;
+        else if (distance_array[(i+1)*W-1 -: W] < 40) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 2;
+        else if (distance_array[(i+1)*W-1 -: W] < 60) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 3;
+        else if (distance_array[(i+1)*W-1 -: W] < 80) type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 4;
+        else type_array[(i+1)*TYPE_W-1 -: TYPE_W] = 5;
+      end
+      done_calc = 1'b1;
+      @(posedge clk);
+      #1;
+      done_calc = 1'b0;
+      wait(valid_sort);
+      @(posedge clk);
+      #1;
+    end
+  endtask
 
-//stimuli generation
-initial begin
-  rst = 1'b1;
-  done = 1'b0;
-  #5 rst = 1'b0;
-  @(posedge clk);
-  
-  set_input_array(100);
-  set_input_array(200);
-  set_input_array(1000);
-end
+  task display_array();
+    begin
+      wait(done_calc);
+      $display("distance&type_array = ");
+      for (i = 0; i < (1<<L); i = i + 1) begin
+        $display("%0d, %0d", distance_array[(i+1)*W-1 -: W], type_array[(i+1)*TYPE_W-1 -: TYPE_W]);
+      end
+      wait(valid_sort);
+      $display("Sorted distance&type_array =");
+      for (i = 0; i < (1<<L); i = i + 1) begin
+        $display("%0d, %0d", distance_array_sorted[(i+1)*W-1 -: W], type_array_sorted[(i+1)*TYPE_W-1 -: TYPE_W]);
+      end
+    end
+  endtask
 
+<<<<<<< HEAD
 initial begin
   $dumpfile("distance_sort_tb.vcd");
   $dumpvars;
@@ -152,5 +175,26 @@ initial begin
   #200 $finish;
 >>>>>>> knn_system
 end
+=======
+  // stimuli generation
+  initial begin
+    rst = 1'b1;
+    i = 0;
+    distance_array <= {W*(1<<L){1'b0}};
+    type_array <= {W*(1<<L){1'b0}};
+    done_calc = 1'b0;
+    #5 rst = 1'b0;
+    @(posedge clk);
+
+    set_input_array(100);
+  end
+
+  initial begin
+    $dumpfile("distance_sort_tb.vcd");
+    $dumpvars;
+    display_array();
+    #200 $finish;
+  end
+>>>>>>> packed_implementation
 endmodule
 

@@ -1,18 +1,50 @@
- module sort_2 #(parameter W, TYPE_W)(
-   input wire [W-1:0] A, B,
-   input wire [TYPE_W-1:0] A_type, B_type,
-   output wire [W-1:0] H, L,
-   output wire [TYPE_W-1:0] H_type, L_type
+ module sort_2 #(parameter W = 16, TYPE_W = 3)(
+   input wire clk,
+   input wire rst,
+   input wire in_valid,
+   input wire ascending,
+   input wire [W-1:0] in_0, in_1,
+   input wire [TYPE_W-1:0] in_0_type, in_1_type,
+   output reg [W-1:0] out_0, out_1,
+   output reg [TYPE_W-1:0] out_0_type, out_1_type,
+   output reg out_valid
  );
 
-  assign a_bigger = A > B;
-  assign H = a_bigger ? A : B;
-  assign L = a_bigger ? B : A;
-  assign H_type = a_bigger ? A_type : B_type;
-  assign L_type = a_bigger ? B_type : A_type;
-
- // assign {H,L} = (A > B) ? {A,B} : {B,A}; not used due to synthesis problem
- // derived from concatenating real operands
-
+ always @(posedge clk) begin
+  if (rst) begin
+    out_valid <= 1'b0;
+    out_0 <= {W{1'b0}};
+    out_0_type <= {TYPE_W{1'b0}};
+    out_1_type <= {TYPE_W{1'b0}};
+    out_1 <= {W{1'b0}};
+  end else begin
+    out_valid <= in_valid;
+    if (ascending) begin
+      if (in_0 < in_1 ) begin
+        out_0 <= in_0;
+        out_0_type <= in_0_type;
+        out_1 <= in_1;
+        out_1_type <= in_1_type;
+      end else begin
+        out_0 <= in_1;
+        out_0_type <= in_1_type;
+        out_1 <= in_0;
+        out_1_type <= in_0_type;
+      end
+    end else begin
+      if (in_0 > in_1 ) begin
+        out_0 <= in_0;
+        out_0_type <= in_0_type;
+        out_1 <= in_1;
+        out_1_type <= in_1_type;
+      end else begin
+        out_0 <= in_1;
+        out_0_type <= in_1_type;
+        out_1 <= in_0;
+        out_1_type <= in_0_type;
+      end
+    end
+  end
+ end
  endmodule
 
